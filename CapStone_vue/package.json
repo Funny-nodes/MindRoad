@@ -1,0 +1,34 @@
+{
+  "name": "capstone-vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@lottiefiles/dotlottie-vue": "^0.6.3",
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.7.9",
+    "buffer": "^6.0.3",
+    "dotenv": "^16.4.7",
+    "fabric": "^6.6.1",
+    "gojs": "^3.0.18",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.176.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vue3-mindmap": "^0.5.12",
+    "vuetify": "^3.7.7",
+    "zdog": "^1.1.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.11"
+  }
+}

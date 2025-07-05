@@ -1,0 +1,51 @@
+-- 새로운 데이터베이스 생성
+CREATE DATABASE capstone
+  CHARACTER SET = 'utf8mb4'
+  COLLATE = 'utf8mb4_unicode_ci';
+
+-- 생성된 데이터베이스 사용
+USE capstone;
+
+-- 사용자 테이블
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,  
+    name VARCHAR(50) NOT NULL,    
+    email VARCHAR(100) NOT NULL UNIQUE,      
+    password VARCHAR(255) NOT NULL
+);
+
+-- 팀 테이블
+CREATE TABLE teams (
+    team_id INT PRIMARY KEY AUTO_INCREMENT
+);
+
+-- 사용자-팀 관계 테이블 (다대다 관계 처리)
+CREATE TABLE team_members (
+    member_id INT PRIMARY KEY AUTO_INCREMENT,
+    team_id INT NOT NULL,
+    user_id INT NOT NULL,
+    isAdmin INT NOT NULL,
+    FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- 프로젝트 테이블 (팀과 연결)
+CREATE TABLE projects (
+    project_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    team_id INT NOT NULL,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE
+);
+
+
+-- 노드 테이블 (프로젝트와 연결)
+CREATE TABLE nodes (
+    id INT PRIMARY KEY AUTO_INCREMENT,        -- 고유 ID
+    project_id INT NOT NULL,                  -- 해당 노드가 속한 프로젝트
+    parent_key INT DEFAULT NULL,          -- 부모 노드 (없으면 NULL)
+    content VARCHAR(255) NOT NULL,               -- 노드의 내용
+    isSelected TINYINT NOT NULL,
+    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE, -- 프로젝트와 연결
+    FOREIGN KEY (parent_key) REFERENCES nodes(id) ON DELETE CASCADE       -- 계층 구조 유지
+);
