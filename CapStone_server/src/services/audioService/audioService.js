@@ -3,10 +3,13 @@ const fs = require("fs");
 
 const { convertMP3 } = require("./convertMP3");
 const { mixAudio } = require("./audioMix");
+const { convertToWhisperWav } = require("./convertToWhisperWav")
+const { callWhisperCPP } = require("./callWhisperCPP")
 const { callClovaSpeechAPI } = require("./callClovaSpeech");
 const { askOpenAI } = require("./callOpenAI");
 const { deleteFiles } = require("./deleteFiles");
 const nodeService = require("../nodeService/nodeService");
+const { error } = require("console");
 
 const audioFolder = path.join(__dirname, "../../../storage/audio");
 const tempAudioFolder = path.join(__dirname, "../../../storage/temp_audio");
@@ -32,8 +35,15 @@ exports.processIndividualFile = async (
         path.join("audio")
       );
 
-      const inputPath = await convertMP3(userObject.inputPath, outputPath);
-      const response = await callClovaSpeechAPI(outputPath); // 음성 텍스트 얻기
+      // const inputPath = await convertMP3(userObject.inputPath, outputPath);
+      
+    
+      const outputWavPath = await convertToWhisperWav(userObject.inputPath, outputPath)
+      
+      // const response = await callClovaSpeechAPI(outputPath) // 음성 텍스트 얻기
+
+      const response = await callWhisperCPP(outputWavPath)
+      console.log("audioService.js 51 line:", response)
 
       userSpeech[userObject.nickname] = response; // 닉네임과 음성 텍스트 매핑
       speakerNames.push(userObject.nickname); // 화자 이름 목록에 추가
@@ -111,7 +121,7 @@ exports.mixAndConvertAudio = async (roomId, roomAudioBuffers) => {
 
 exports.processAudioFile = async (mp3Path, speakerCount) => {
   try {
-    const fileName = path.basename(mp3Path, ".mp3"); // .mp3 제외한 파일명 추출
+    const fileName = path.basename(mp3Path, ".wav"); // .mp3 제외한 파일명 추출
     let speakerNames = fileName.includes("+")
       ? fileName.split("+").join(", ")
       : fileName; // 화자 이름 변환
