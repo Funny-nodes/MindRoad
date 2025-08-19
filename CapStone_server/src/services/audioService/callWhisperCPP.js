@@ -1,5 +1,6 @@
 const fs = require("fs")
 const path = require("path")
+const os = require("os")
 const { exec } = require("child_process");
 const { stderr } = require("process");
 
@@ -11,10 +12,11 @@ async function callWhisperCPP(filePath) {
   const whisperBinary = path.resolve(__dirname, "../../../whisper.cpp/build/bin/Release/whisper-cli.exe"); // Whisper 실행 파일 경로
   const modelPath = path.resolve(
     __dirname,
-    "../../../whisper.cpp/models/ggml-base.bin"
+    "../../../whisper.cpp/models/ggml-large-v1.bin"
   ); // 모델 경로
 
-  const command = `"${whisperBinary}" -m "${modelPath}" -f "${filePath}" --language ko`;
+  const threads = os.cpus().length
+  const command = `"${whisperBinary}" -m "${modelPath}" -f "${filePath}" --language ko --threads ${threads} --beam-size 5 --temperature 0 --no-timestamps`;
 
   return new Promise((resolve, reject) => {
     exec(command, { maxBuffer: 1024 * 500 }, (error, stdout, stderr) => {
