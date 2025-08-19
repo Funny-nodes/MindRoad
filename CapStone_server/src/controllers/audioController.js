@@ -1,11 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
-const {
-  processAudioFile,
-  mixAndConvertAudio,
-  processIndividualFile,
-} = require("../services/audioService/audioService");
+const { processIndividualFile } = require("../services/audioService/audioService");
 
 const meetingAudioBuffers = {}; // 각 방의 오디오 파일 저장
 const meetingEvents = {}; // 방별 이벤트 관리
@@ -21,6 +17,9 @@ module.exports = (io) => {
 
   return {
     uploadMeetingAudio: async (req, res) => {
+
+      let roomId;
+
       try {
         if (!req.file || !req.body.roomId) {
           return res
@@ -28,7 +27,7 @@ module.exports = (io) => {
             .send({ message: "❌ Missing audio file or roomId" });
         }
 
-        const roomId = req.body.roomId;
+        roomId = req.body.roomId;
         const nickname = req.body.nickname;
         const inputPath = req.file.path;
 

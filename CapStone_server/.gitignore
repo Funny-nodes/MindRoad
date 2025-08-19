@@ -9,6 +9,6 @@
 
 node_modules/
 
-
-
-CapStone_server/google_key/*.json
+# STT 모듈은 다시 다운받는다.
+whisper.cpp/
+*.bin

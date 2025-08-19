@@ -7,23 +7,9 @@ module.exports = (io) => {
   const { uploadMeetingAudio, uploadRealTimeAudio } = audioController(io);
 
   // 올바른 미들웨어 체인 구성
-  router.post(
-    "/meeting",
-    upload.single("audio"),
-    (req, res, next) => {
-      next(); // 다음 미들웨어로 제어 전달
-    },
-    uploadMeetingAudio // 함수 참조만 전달, 즉시 호출하지 않음
-  );
+  router.post( "/meeting", upload.single("audio"), uploadMeetingAudio);
 
-  router.post(
-    "/realTime",
-    upload.single("audio"),
-    (req, res, next) => {
-      next(); // 다음 미들웨어로 제어 전달
-    },
-    uploadRealTimeAudio // 함수 참조만 전달, 즉시 호출하지 않음
-  );
+  router.post( "/realTime", upload.single("audio"), uploadRealTimeAudio);
 
   return router;
 };

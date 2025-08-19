@@ -463,16 +463,16 @@ export default {
 
         this.recordedChunks.push(event.data);
 
-        if (blob.size > 0 && this.mediaRecorder.state === "recording") {
-          try {
-            await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
-            console.log("✅ 업로드 성공");
-          } catch (err) {
-            console.error("❌ 업로드 실패:", err.message);
-          }
-        } else {
-          console.warn("🚫 실시간 종료");
-        }
+        // if (blob.size > 0 && this.mediaRecorder.state === "recording") {
+        //   try {
+        //     await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
+        //     console.log("✅ 업로드 성공");
+        //   } catch (err) {
+        //     console.error("❌ 업로드 실패:", err.message);
+        //   }
+        // } else {
+        //   console.warn("🚫 실시간 종료");
+        // }
       };
 
       this.uploadInterval = setInterval(async () => {

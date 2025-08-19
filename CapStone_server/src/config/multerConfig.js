@@ -1,11 +1,13 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { makeSafeNickname } = require("../services/audioService/safeNickname.js")
 
 // 파일 저장 경로 설정
 const baseTempAudioFolder = path.join(__dirname, "../../storage/temp_audio");
 
 const storage = multer.diskStorage({
+  
   destination: (req, file, cb) => {
     const { roomId, type } = req.body; // 요청에서 roomId와 type(RealTime or Meeting) 추출
 
@@ -31,10 +33,12 @@ const storage = multer.diskStorage({
 
     if (!nickname || !roomId) {
       return cb(new Error("닉네임과 roomId가 필요합니다."), null);
-    }
+    } 
+
+    const safeNickname = makeSafeNickname(nickname)
 
     // 파일명: nickname_roomId.mp3 형식으로 저장
-    const fileName = `${nickname}_${roomId}.mp3`;
+    const fileName = `${safeNickname}_${roomId}.webm`;
     req.fileName = fileName;
     cb(null, fileName);
   },

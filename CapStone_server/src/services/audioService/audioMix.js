@@ -10,7 +10,7 @@ async function mixAudio(folderPath, outputPath) {
 
       // .mp3 파일 필터링 후 알파벳순 정렬
       const inputPaths = files
-        .filter((file) => path.extname(file).toLowerCase() === ".mp3")
+        .filter((file) => path.extname(file).toLowerCase() === ".wav")
         .map((file) => path.join(folderPath, file))
         .sort((a, b) => path.basename(a).localeCompare(path.basename(b), "ko"));
 
