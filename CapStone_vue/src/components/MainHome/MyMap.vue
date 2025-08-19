@@ -1031,11 +1031,9 @@ export default {
     const showTopicModal = ref(false);
     const selectedTopic = ref("");
     const topicOptions = [
-      "컴퓨터 공학",
-      "기계전자 공학",
-      "디자인 및 예술",
-      "인문사회 및 경영",
-      "융합 및 교양 교육",
+      "관광 및 지역자원",
+      "의학 및 의료정보",
+      "법률 및 행정",
     ];
 
     const handleTopicSubmit = async () => {
