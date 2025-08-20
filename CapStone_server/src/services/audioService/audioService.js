@@ -4,7 +4,7 @@ const fs = require("fs");
 const { convertMP3 } = require("./convertMP3");
 const { mixAudio } = require("./audioMix");
 const { convertToWhisperWav } = require("./convertToWhisperWav")
-const { callWhisperCPP } = require("./callWhisperCPP")
+const { callWhisperCPP, formatWhisperResponse, sortSRTByTime} = require("./callWhisperCPP")
 const { callClovaSpeechAPI } = require("./callClovaSpeech");
 const { askOpenAI } = require("./callOpenAI");
 const { deleteFiles } = require("./deleteFiles");
@@ -21,6 +21,7 @@ exports.processIndividualFile = async (
 ) => {
   const userSpeech = {}; // 멤버별 음성 텍스트 저장
   const speakerNames = []; // 화자 이름 목록
+  
 
   try {
     if (roomAudioBuffers == null) return;
@@ -39,14 +40,17 @@ exports.processIndividualFile = async (
       
     
       const outputWavPath = await convertToWhisperWav(userObject.inputPath, outputPath)
-      
-      // const response = await callClovaSpeechAPI(outputPath) // 음성 텍스트 얻기
 
       const response = await callWhisperCPP(outputWavPath)
       console.log("audioService.js 51 line:", response)
 
-      userSpeech[userObject.nickname] = response; // 닉네임과 음성 텍스트 매핑
+      const formattedResponse = await formatWhisperResponse(response)
+
+      userSpeech[userObject.nickname] = formattedResponse; // 닉네임과 음성 텍스트 매핑
       speakerNames.push(userObject.nickname); // 화자 이름 목록에 추가
+
+      
+
     }
 
     // OpenAI에 전달할 데이터 준비
@@ -57,6 +61,8 @@ exports.processIndividualFile = async (
     );
 
     const nodeData = data;
+
+    
 
     const openAIResponse = await askOpenAI(
       userSpeech,
