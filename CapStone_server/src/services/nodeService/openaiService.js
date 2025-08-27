@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 // Colab 서버의 public URL을 직접 하드코딩 (URL 반고정)
-const NGROK_URL = "https://mind-road.loca.lt";
+const LOCALTUNNEL_URL = "https://mind-road.loca.lt";
 
 /**
  * 특정 부모 노드(주제)와 클릭한 노드를 기반으로 하위 노드 추천 (Colab API 사용)
@@ -18,9 +18,9 @@ async function getMindmapSuggestions(
   category = " " // 프론트에서 전달된 카테고리
 ) {
   try {
-    // 코랩 ngrok API로 POST 요청
+    // 코랩 LOCALTUNNEL_URL API로 POST 요청
     const response = await axios.post(
-      `${NGROK_URL}/mindmap`,
+      `${LOCALTUNNEL_URL}/mindmap`,
       {
         keyword: selectedNode, // 코랩 API는 'keyword' 파라미터 사용
         category: category,
