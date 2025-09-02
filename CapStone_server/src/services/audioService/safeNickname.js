@@ -51,4 +51,40 @@ function makeSafeNickname(nickname) {
   return safeNickname
 }
 
-module.exports = { makeSafeNickname }
+function timeToSeconds(timeStr) {
+  // "00:00:06" -> 6
+  const [hh, mm, ss] = timeStr.split(":").map(Number);
+  return hh * 3600 + mm * 60 + ss;
+}
+
+function convertSegmentsToSRTJson(userSpeech) {
+  const srtJson = [];
+
+  for (const [nickname, segments] of Object.entries(userSpeech)) {
+      
+    const segmentArray = Array.isArray(segments)
+      ? segments
+      : Object.values(segments);
+  
+    segmentArray.forEach((seg) => {
+      const match = seg.match(/^\[(.*?)\]\s*(.*)$/);
+      if (match) {
+        const time = match[1];
+        const speech = match[2];
+        srtJson.push({ time, speaker: nickname, speech });
+      }
+    });
+  }
+
+  srtJson.sort((a, b) => {
+    const [aStart, aEnd] = a.time.split(" --> ").map(timeToSeconds);
+    const [bStart, bEnd] = b.time.split(" --> ").map(timeToSeconds);
+
+    if (aStart !== bStart) return aStart - bStart; // 시작 시간이 빠른 순
+    return aEnd - bEnd; // 시작이 같으면 끝나는 시간이 빠른 순
+  });
+
+  return srtJson;
+}
+
+module.exports = { makeSafeNickname, convertSegmentsToSRTJson }

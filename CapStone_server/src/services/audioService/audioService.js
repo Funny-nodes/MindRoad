@@ -1,15 +1,14 @@
 const path = require("path");
 const fs = require("fs");
 
-const { convertMP3 } = require("./convertMP3");
+
 const { mixAudio } = require("./audioMix");
 const { convertToWhisperWav } = require("./convertToWhisperWav")
-const { callWhisperCPP, formatWhisperResponse, sortSRTByTime} = require("./callWhisperCPP")
-const { callClovaSpeechAPI } = require("./callClovaSpeech");
+const { makeSafeNickname, convertSegmentsToSRTJson } = require("./safeNickname")
 const { askOpenAI } = require("./callOpenAI");
 const { deleteFiles } = require("./deleteFiles");
 const nodeService = require("../nodeService/nodeService");
-const { error } = require("console");
+const { callSTT } = require("./callSTT")
 
 const audioFolder = path.join(__dirname, "../../../storage/audio");
 const tempAudioFolder = path.join(__dirname, "../../../storage/temp_audio");
@@ -22,35 +21,37 @@ exports.processIndividualFile = async (
   const userSpeech = {}; // 멤버별 음성 텍스트 저장
   const speakerNames = []; // 화자 이름 목록
   
+  
 
   try {
-    if (roomAudioBuffers == null) return;
+    if (!roomAudioBuffers || roomAudioBuffers.length === 0) return;
 
-    // // 처음 한 번만 tempFolder 설정
-    // const userTempFolder = path.dirname(roomAudioBuffers[0].inputPath);
 
-    // 각 멤버의 음성텍스트를 저장
-    for (const userObject of roomAudioBuffers) {
-      const outputPath = userObject.inputPath.replace(
-        path.join("temp_audio"),
-        path.join("audio")
-      );
+    const outputWavPaths = await Promise.all(
+      roomAudioBuffers.map(async (userObject) => {
+        const outputPath = userObject.inputPath.replace(
+          path.join("temp_audio"),
+          path.join("audio")
+        );
 
-      // const inputPath = await convertMP3(userObject.inputPath, outputPath);
-      
-    
-      const outputWavPath = await convertToWhisperWav(userObject.inputPath, outputPath)
+        const wavPath = await convertToWhisperWav(
+          userObject.inputPath,
+          outputPath
+        );
 
-      const response = await callWhisperCPP(outputWavPath)
-      console.log("audioService.js 51 line:", response)
+        return { nickname: userObject.nickname, wavPath}
 
-      const formattedResponse = await formatWhisperResponse(response)
+      })
+    );
 
-      userSpeech[userObject.nickname] = formattedResponse; // 닉네임과 음성 텍스트 매핑
-      speakerNames.push(userObject.nickname); // 화자 이름 목록에 추가
+    const sttResults = await callSTT(outputWavPaths.map((o) => o.wavPath));
 
-      
+    // 결과를 userSpeech와 speakerNames에 저장
+    for (const stt of sttResults.results) {
+      const nickname = stt.nickname
 
+      userSpeech[nickname] = stt.segments
+      speakerNames.push(nickname);
     }
 
     // OpenAI에 전달할 데이터 준비
@@ -61,11 +62,12 @@ exports.processIndividualFile = async (
     );
 
     const nodeData = data;
+    const formattedSpeech = convertSegmentsToSRTJson(userSpeech)
+    console.log("📌 변환된 SRT JSON:", JSON.stringify(formattedSpeech, null, 2));
 
-    
 
     const openAIResponse = await askOpenAI(
-      userSpeech,
+      formattedSpeech,
       speakerNames,
       nodeData,
       isRealTime
