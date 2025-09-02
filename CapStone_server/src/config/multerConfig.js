@@ -35,10 +35,10 @@ const storage = multer.diskStorage({
       return cb(new Error("닉네임과 roomId가 필요합니다."), null);
     } 
 
-    const safeNickname = makeSafeNickname(nickname)
+    // const safeNickname = makeSafeNickname(nickname)
 
     // 파일명: nickname_roomId.mp3 형식으로 저장
-    const fileName = `${safeNickname}_${roomId}.webm`;
+    const fileName = `${nickname}_${roomId}.webm`;
     req.fileName = fileName;
     cb(null, fileName);
   },

@@ -78,6 +78,7 @@ module.exports = (io) => {
         // 🎶 모든 참여자의 파일이 도착했으므로 믹싱 및 MP3 변환 실행
         console.log(`🎶 ${expectedUsers}명 모두 업로드 완료`);
 
+        
         const { openAIResponse, mixedAudioPath } = await processIndividualFile(
           meetingAudioBuffers[roomId],
           roomId,

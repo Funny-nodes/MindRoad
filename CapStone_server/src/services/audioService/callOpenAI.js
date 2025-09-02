@@ -1,5 +1,6 @@
 const OpenAI = require("openai");
 const dotenv = require("dotenv");
+const { convertSegmentsToSRTJson } = require("./safeNickname")
 
 // 환경 변수 로드
 dotenv.config();
@@ -17,26 +18,13 @@ async function askOpenAI(
   try {
     if (!speakerSpeech || !speakerNames) return;
 
-    let formattedSpeech = Object.entries(speakerSpeech)
-      .map(([nickname, speechText], index) => {
-        let speechBlocks = speechText.split("\n\n");
-        return speechBlocks
-          .map((block, i) => {
-            let lines = block.split("\n");
-            if (lines.length < 3) return ""; // SRT 형식이 아닐 경우 무시
-
-            let time = lines[1]; // "00:00:21,000 --> 00:00:28,840"
-            let speech = lines.slice(2).join(" "); // 발언 내용만 추출
-
-            return `${time}\n${nickname}: ${speech}`;
-          })
-          .filter((line) => line) // 빈 줄 제거
-          .join("\n\n");
-      })
-      .join("\n\n");
+    const speakerSpeechStr = speakerSpeech
+      .map((seg) => `[${seg.time}] ${seg.speaker}: ${seg.speech}`)
+      .join("\n");
+  
 
     const roots = nodeData.filter((item) => item.parent === 0);
-    console.log("테스트:   " + JSON.stringify(roots[0].name));
+    console.log("테스트: " + JSON.stringify(roots[0].name));
 
     let finalPrompt = `
     이 음성 텍스트는 회의 중 기록된 대화입니다. 한국어로 응답해주세요.
@@ -86,7 +74,7 @@ async function askOpenAI(
     ${speakerNames.join(", ")}
 
     #### **SRT 음성 텍스트**
-    ${formattedSpeech} 
+    ${speakerSpeechStr} 
 
     #### **현재 노드 데이터**
     ${nodeData}`;
@@ -118,7 +106,7 @@ async function askOpenAI(
 
         ### 🔍 **입력 데이터**
         #### **대화 내용**
-        ${formattedSpeech} 
+        ${speakerSpeech} 
 
         #### **현재 노드 데이터**
         ${JSON.stringify(nodeData)}
