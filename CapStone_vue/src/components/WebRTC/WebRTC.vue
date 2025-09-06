@@ -1,175 +1,218 @@
 <template>
   <div id="app">
     <div v-if="!joined" class="login-container">
-      <div class="login-box">
-        <h1 class="title">음성 회의실</h1>
-        <p class="subtitle">음성 회의방에 참여하세요</p>
-
-        <div class="input-group">
-          <!-- 방 번호 입력 필드 제거 -->
-          <button @click="joinRoom" :disabled="joining" class="join-button">
-            {{ joining ? "입장중..." : "회의실 입장하기" }}
-          </button>
+      <div class="login-wrapper">
+        <div class="logo-section">
+          <div class="brand-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <i class="fa-solid fa-microphone-lines"></i>
+          </div>
+          <h1 class="brand-title">VoiceHub</h1>
+          <p class="brand-subtitle">Professional Voice Conference</p>
         </div>
 
-        <div class="features">
-          <div class="feature-item">
-            <span class="feature-icon">🎧</span>
-            <span class="feature-text"
-              >실시간 <br />
-              음성대화</span
-            >
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon">📝</span>
-            <span class="feature-text"
-              >회의록 <br />
-              자동기록</span
-            >
-          </div>
-          <div class="feature-item">
-            <span class="feature-icon">👥</span>
-            <span class="feature-text">
-              다중<br />
-              참여자
-            </span>
-          </div>
+        <div class="login-form">
+          <button @click="joinRoom" :disabled="joining" class="join-btn">
+            {{ joining ? "연결 중..." : "회의실 입장" }}
+          </button>
         </div>
       </div>
     </div>
-    <div v-else class="meeting-container">
-      <div class="meeting-header">
-        <h2 class="room-title">Room: {{ displayRoomId }}</h2>
-        <div class="connection-info">
-          <span
-            class="status-badge"
-            :class="connectionStatus"
-            @click="leaveRoom()"
-            style="cursor: pointer"
-          >
-            <span class="status-text">{{ connectionStatus }}</span>
-            <v-icon class="status-icon" icon="mdi-phone-off"></v-icon>
-          </span>
-        </div>
-      </div>
 
-      <div class="participants-section">
-        <h3 class="section-title">
-          참여자 목록
-          <span class="participants-count">
-            ({{ participants.length }}명 참가)
-          </span>
-        </h3>
-        <ul class="participants-list">
-          <li
-            v-for="id in participants"
-            :key="id"
-            class="participant-item"
-            :class="{ speaking: speakingParticipants[id] }"
-          >
-            <div class="icon-wrapper">
-              <v-icon icon="mdi-account-circle" size="28px"></v-icon>
-              <span class="status-dot"></span>
+    <div v-else class="meeting-interface">
+      <!-- 상단 헤더 - 일반 정적 위치 -->
+      <header class="meeting-header">
+        <div class="header-content">
+          <div class="room-section">
+            <span class="room-label">Room {{ displayRoomId }}</span>
+            <div class="live-badge">
+              <div class="live-dot"></div>
+              <span>LIVE</span>
             </div>
-            <!-- 여기를 수정하여 닉네임 표시 -->
-            {{ getUserDisplayName(id) }}
-            {{ id === currentUserId ? "(나)" : "" }}
-            <span v-if="speakingParticipants[id]" class="speaking-indicator"
-              >🎤</span
-            >
-          </li>
-        </ul>
-      </div>
-
-      <div class="audio-controls">
-        <button @click="toggleMute" class="control-button">
-          <v-icon v-if="isMuted" icon="mdi-volume-off"></v-icon>
-          <v-icon v-else icon="mdi-volume-high"></v-icon>
-        </button>
-
-        <select
-          v-model="selectedAudioDevice"
-          @change="changeAudioDevice"
-          :disabled="isRecording"
-          class="device-select"
-        >
-          <option
-            v-for="device in audioDevices"
-            :key="device.deviceId"
-            :value="device.deviceId"
-          >
-            {{
-              device.label || `오디오 장치 ${device.deviceId.substr(0, 5)}...`
-            }}
-          </option>
-        </select>
-
-        <div class="audio-meter">
-          <div class="meter-fill" :style="{ width: `${audioLevel}%` }"></div>
-        </div>
-      </div>
-
-      <div class="recording-section">
-        <h3 class="section-title">녹음</h3>
-        <div class="recording-controls">
-          <button
-            @click="toggleRecording"
-            class="recording-button"
-            :class="{ 'recording-active': isRecording }"
-            :disabled="isProcessingRecording"
-          >
-            <v-icon v-if="isRecording" icon="mdi-microphone-off"></v-icon>
-            <v-icon v-else icon="mdi-microphone"></v-icon>
-          </button>
-        </div>
-      </div>
-
-      <div class="report-section">
-        <h3 class="section-title">회의 기록</h3>
-
-        <!-- 🔹 처리 중 로딩 오버레이 -->
-        <div v-if="isLoading" class="loading-overlay-in-card">
-          <div class="processing-container">
-            <div class="loading-spinner">
-              <DotLottieVue
-                style="height: 130px; width: 130px"
-                autoplay
-                loop
-                speed="1.2"
-                :src="lottieUrl"
-              />
+          </div>
+          
+          <div class="header-spacer"></div>
+          
+          <div class="controls-section">
+            <div class="participant-indicator">
+              <i class="fa-solid fa-user-group" style="font-size: 13px;"></i>
+              <span class="count-text">{{ participants.length }}명</span>
             </div>
-
-            <div class="processing-text">회의록 생성 중</div>
-
-            <div class="progress-bar-container">
-              <div class="progress-bar"></div>
-            </div>
-
-            <!-- status-dots 부분을 제거 -->
+            <button @click="leaveRoom()" class="exit-button" :class="connectionStatus.toLowerCase()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+            </button>
           </div>
         </div>
+      </header>
 
-        <!-- 회의 내용이 있을 경우 -->
-        <div class="meeting-report" v-else v-html="meetingContent"></div>
+      <!-- 메인 콘텐츠 - 세로 배치, 정적 위치 -->
+      <main class="meeting-content">
 
-        <div class="download-buttons-centered" v-if="!isLoading">
-          <button class="download-button" @click="downloadAudio">
-            음성파일 다운로드
-          </button>
-          <button class="download-button" @click="downloadPDF">
-            PDF 다운로드
-          </button>
-        </div>
+        <!-- 참여자 섹션 -->
+        <section class="content-section participants-section">
+          
+          
+          <div class="participants-container">
+            <div
+                v-for="id in participants"
+                :key="id"
+                class="participant-item"
+                :class="{ 'current-user': id === currentUserId }"
+              >
+              <div class="participant-avatar">
+                <div class="avatar-circle">{{ getUserDisplayName(id).charAt(0) }}</div>
+                <div class="status-indicator"></div>
+              </div>
+              
+              <div class="participant-info">
+                <div class="participant-name">
+                  {{ getUserDisplayName(id) }}
+                  <span v-if="id === currentUserId" class="you-badge">You</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 오디오 컨트롤 섹션 -->
+        <section class="content-section audio-section">
+          <div class="section-header">
+            <h2 class="section-title">오디오 설정</h2>
+            <span class="section-badge" :class="{ muted: isMuted }">
+              {{ isMuted ? "음소거" : "활성" }}
+            </span>
+          </div>
+          
+          <div class="audio-controls">
+            <button @click="toggleMute" class="audio-toggle-btn" :class="{ active: !isMuted }">
+              <div class="btn-icon">
+                <i v-if="isMuted" class="fa-solid fa-volume-low" style="font-size: 16px;"></i>
+                <i v-else class="fa-solid fa-volume-xmark" style="font-size: 16px;"></i>
+              </div>
+              <span>{{ isMuted ? "음소거 해제" : "음소거" }}</span>
+            </button>
+            
+            <div class="control-group">
+              <label class="control-label">오디오 장치</label>
+              <select
+                v-model="selectedAudioDevice"
+                @change="changeAudioDevice"
+                :disabled="isRecording"
+                class="device-select"
+              >
+                <option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
+                  {{ device.label || `장치 ${device.deviceId.substr(0, 8)}...` }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="control-group">
+              <label class="control-label">음성 레벨</label>
+              <div class="audio-level">
+                <div class="level-bar">
+                  <div class="level-fill" :style="{ width: `${audioLevel}%` }"></div>
+                </div>
+                <span class="level-text">{{ Math.round(audioLevel) }}%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 녹음 섹션 -->
+        <section class="content-section recording-section">
+          <div class="section-header">
+            <h2 class="section-title">회의 녹음</h2>
+            <span class="section-badge" :class="{ active: isRecording }">
+              {{ isRecording ? "녹음 중" : "대기" }}
+            </span>
+          </div>
+          
+          <div class="recording-controls">
+            <button
+              @click="toggleRecording"
+              class="record-button"
+              :class="{ 
+                recording: isRecording,
+                disabled: isProcessingRecording 
+              }"
+              :disabled="isProcessingRecording"
+            >
+              <div class="record-icon">
+                <svg v-if="isRecording" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12" rx="2"/>
+                </svg>
+                <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="10"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </div>
+              
+              <div class="record-info">
+                <span class="record-title">{{ isRecording ? "녹음 중지" : "녹음 시작" }}</span>
+                <span class="record-desc">{{ isRecording ? "클릭하여 중지" : "회의 내용을 기록합니다" }}</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <!-- 회의록 섹션 -->
+        <section class="content-section transcript-section">
+          <div class="section-header">
+            <h2 class="section-title">회의록</h2>
+            <div class="header-actions" v-if="!isLoading">
+              <button class="action-btn" @click="downloadAudio">
+                <i class="fa-solid fa-file-audio" style="font-size: 14px;"></i>
+                음성파일
+              </button>
+              <button class="action-btn primary" @click="downloadPDF">
+                <i class="fa-solid fa-file" style="font-size: 13.5px;"></i>
+                PDF
+              </button>
+            </div>
+          </div>
+          
+          <div class="transcript-body">
+            <!-- 로딩 상태 -->
+            <div v-if="isLoading" class="loading-container">
+              <div class="loading-animation">
+                <DotLottieVue
+                  style="height: 100px; width: 100px"
+                  autoplay
+                  loop
+                  speed="1.5"
+                  :src="lottieUrl"
+                />
+              </div>
+              <div class="loading-info">
+                <h3>AI 회의록 생성 중</h3>
+                <p>음성 데이터를 분석하여 회의록을 작성하고 있습니다</p>
+              </div>
+              <div class="loading-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 회의록 내용 -->
+            <div v-else class="transcript-content" v-html="meetingContent"></div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 재연결 버튼 -->
+      <div v-if="connectionStatus === 'disconnected'" class="reconnect-overlay">
+        <button @click="reconnect" class="reconnect-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 12a8 8 0 0 1 8-8V2.5L16 6l-4 3.5V8a6 6 0 1 0 6 6h2a8 8 0 0 1-16 0z"/>
+          </svg>
+          다시 연결
+        </button>
       </div>
-
-      <button
-        v-if="connectionStatus === 'disconnected'"
-        @click="reconnect"
-        class="reconnect-button"
-      >
-        재연결
-      </button>
     </div>
   </div>
 </template>
@@ -463,16 +506,16 @@ export default {
 
         this.recordedChunks.push(event.data);
 
-        // if (blob.size > 0 && this.mediaRecorder.state === "recording") {
-        //   try {
-        //     await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
-        //     console.log("✅ 업로드 성공");
-        //   } catch (err) {
-        //     console.error("❌ 업로드 실패:", err.message);
-        //   }
-        // } else {
-        //   console.warn("🚫 실시간 종료");
-        // }
+        if (blob.size > 0 && this.mediaRecorder.state === "recording") {
+          try {
+            await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
+            console.log("✅ 업로드 성공");
+          } catch (err) {
+            console.error("❌ 업로드 실패:", err.message);
+          }
+        } else {
+          console.warn("🚫 실시간 종료");
+        }
       };
 
       this.uploadInterval = setInterval(async () => {
@@ -1071,623 +1114,808 @@ export default {
 </script>
 
 <style scoped>
+* {
+  box-sizing: border-box;
+}
+
 #app {
-  font-family: "Noto Sans KR", sans-serif;
-  min-height: 100vh; /* height: 100vh를 min-height로 변경 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #1e293b;
 }
 
-.mouse-tracking-container {
+/* ===== 다크모드 로그인 화면만 적용 ===== */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   position: relative;
-  width: 100%;
-  height: 100%;
+  overflow: hidden;
 }
 
-.cursor {
+/* 다크모드 배경 장식 */
+.login-container::before {
+  content: '';
   position: absolute;
-  width: 5px;
-  height: 5px;
-  pointer-events: none; /* 클릭 이벤트가 발생하지 않도록 설정 */
-  transform: translate(-50%, -50%); /* 커서가 정확히 마우스 위치에 놓이도록 */
-  background-color: none;
-  font-size: 20px;
-  border-radius: 50%; /* 원형으로 만들기 */
-}
-
-.sidebar {
-  position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  background: white;
-  transition: width 0.3s ease;
-  overflow: hidden;
-  width: 60px;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%);
+  pointer-events: none;
 }
 
-.sidebar-collapsed {
-  width: 60px;
-}
-
-.sidebar-content {
-  width: 400px;
-  height: 100%;
-  min-width: 400px;
-  transform: translateX(0);
-  transition: transform 0.3s ease;
-}
-
-.sidebar-collapsed .sidebar-content {
-  transform: translateX(-340px);
-}
-
-/* 로그인 화면 스타일 */
-.login-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.login-box {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  max-width: none;
-  flex-shrink: 0;
+.login-wrapper {
+  width: 100%;
+  max-width: 380px;
   text-align: center;
+  position: relative;
+  z-index: 10;
 }
 
-.title {
-  font-size: 2.5em;
-  color: #2c3e50;
-  margin-bottom: 10px;
+.logo-section {
+  margin-bottom: 48px;
+}
+
+.brand-icon {
+  position: relative;
+  display: inline-flex;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 24px;
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3),
+              0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.brand-icon::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 22px;
+  z-index: -1;
+  opacity: 0.3;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+.brand-icon i {
+  position: absolute;
+  font-size: 24px;
+  color: white;
+}
+
+.brand-title {
+  font-size: 2.25rem;
   font-weight: 700;
+  background: linear-gradient(135deg, #ffffff, #cbd5e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.025em;
 }
 
-.subtitle {
-  color: #7f8c8d;
-  margin-bottom: 30px;
-  font-size: 1.1em;
+.brand-subtitle {
+  font-size: 1.125rem;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 400;
 }
 
-.input-group {
-  margin-bottom: 30px;
+.login-form {
+  margin-bottom: 40px;
 }
 
-.room-input {
-  width: 100%;
-  padding: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  font-size: 1.1em;
-  margin-bottom: 15px;
-  transition: all 0.3s ease;
-}
-
-.room-input:focus {
-  border-color: #3498db;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.input-filled {
-  border-color: #3498db;
-}
-
-.join-button {
-  width: 100%;
-  padding: 15px;
-  background: #3498db;
+.join-btn {
+  width: 85%;
+  height: 52px;
+  margin: 0 auto; 
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 1.1em;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
 }
 
-.join-button:hover {
-  background: #2980b9;
+.join-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.join-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.5);
 }
 
-.join-button:disabled {
-  background: #bdc3c7;
+.join-btn:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.join-btn:disabled {
+  opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
 
-.features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 40px;
-}
-
-.feature-item {
+/* ===== 기존 라이트모드 회의 인터페이스 유지 ===== */
+.meeting-interface {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.feature-icon {
-  font-size: 2em;
-}
-
-.feature-text {
-  color: #7f8c8d;
-  font-size: 0.9em;
-}
-
-/* 회의실 화면 스타일 */
-.meeting-container {
-  width: 360px;
-  max-width: none;
-  flex-shrink: 0;
-  margin: 20px auto;
-  padding: 24px;
+  max-width: 360px;
+  margin: 0 auto;
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  min-height: calc(100vh - 40px);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
+/* ===== 회의 헤더 ===== */
 .meeting-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
+  height: 64px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 50;
 }
 
-.mouse-cursor {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  background-color: red;
-  border-radius: 50%;
-  pointer-events: none;
-  transition: transform 0.05s linear;
-}
-
-.cursor-label {
-  position: absolute;
-  top: -20px;
-  left: 5px;
-  background-color: black;
-  color: white;
-  padding: 2px 5px;
-  border-radius: 5px;
-  font-size: 12px;
-}
-
-.room-title {
-  font-size: 1.8em;
-  color: #2c3e50;
-  margin: 0;
-}
-
-.connection-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.status-badge {
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 0.9em;
-  font-weight: 500;
-}
-
-.Connected {
-  background: #27ae60;
-  color: white;
-}
-
-.Disconnected {
-  background: #e74c3c;
-  color: white;
-}
-
-.Error {
-  background: #f1c40f;
-  color: white;
-}
-
-.participants-count {
-  color: #7f8c8d;
-  font-size: 0.9em;
-}
-
-.content-grid {
+.header-content {
+  height: 100%;
+  padding: 0 24px;
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 24px;
-  flex-grow: 1;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  max-width: 100%;
 }
 
-.main-controls {
+.room-section {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.audio-controls {
-  width: 300px;
-  max-width: none;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 12px;
-  padding: 16px;
-  background: #f6f6f6;
-  border-radius: 12px;
+  min-width: 140px;
+  flex-shrink: 0;
 }
 
-.control-button {
-  width: 100%;
-  padding: 12px;
-  background: #3498db;
+.room-label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  min-width: 50px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: smooth-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.header-spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.controls-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 100px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.participant-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-weight: 500;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.count-text {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.exit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #ef4444;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 500;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.control-button:hover {
-  background: #2980b9;
+.exit-button:hover {
+  background: #dc2626;
+  transform: scale(1.05);
 }
 
-.device-select {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 11px;
-  transition: all 0.3s ease;
-  outline: none;
-  background-color: white;
-}
-
-.device-select:hover {
-  border-color: #ababab;
-}
-
-.audio-meter {
-  width: 100%;
-  height: 8px;
-  background: #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.meter-fill {
-  height: 100%;
-  background: #2ecc71;
-  transition: width 0.1s ease;
-}
-
-.content-panels {
+/* ===== 메인 콘텐츠 - 통일된 흰색 배경 ===== */
+.meeting-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0;
+  background: white; /* 전체 통일된 흰색 배경 */
+  overflow-y: auto;
 }
 
-.recording-section,
-.report-section,
-.participants-section {
-  width: 300px;
-  max-width: none;
-  flex-shrink: 0;
-  padding: 20px;
-  background: #f6f6f6;
-  border-radius: 10px;
+.content-section {
+  background: white; /* 모든 섹션 흰색 배경으로 통일 */
+  position: relative;
+  /* 구분을 위한 서브틀한 border만 사용 */
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.report-section {
-  flex-grow: 1;
-  min-height: 400px;
+/* 마지막 섹션은 하단 border 제거 */
+.content-section:last-child {
+  border-bottom: none;
+}
+
+/* ===== 섹션 헤더 - 배경 제거하고 패딩으로 구분 ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 16px 24px; /* 상단 패딩 증가 */
+  background: white; /* 회색 배경 제거 */
+  border-bottom: none; /* 헤더 하단 border 제거 */
 }
 
 .section-title {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-size: 1.5em;
-}
-
-.recording-button {
-  padding: 11px 30px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-.recording-button.recording-active {
-  background: #c0392b;
-  animation: pulse 2s infinite;
-}
-
-.meeting-report {
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  border: 2px solid #e0e0e0;
-  height: calc(100% - 60px);
-  min-height: 300px;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.participants-section {
-  width: 300px;
-  max-width: none;
-  flex-shrink: 0;
-  padding: 20px;
-  background: #f6f6f6;
-  border-radius: 10px;
-  min-height: 100px;
-  height: auto;
-}
-
-.participants-list {
-  list-style: none;
-  padding: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 섹션별 아이콘 추가로 구분감 향상 */
+.participants-section .section-title::before {
+  content: "👥";
+  font-size: 1rem;
+}
+
+.audio-section .section-title::before {
+  content: "🎧";
+  font-size: 1rem;
+}
+
+.recording-section .section-title::before {
+  content: "🎙️";
+  font-size: 1rem;
+}
+
+.transcript-section .section-title::before {
+  content: "📝";
+  font-size: 1rem;
+}
+
+.section-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.section-badge.muted {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.section-badge.active {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+/* ===== 참여자 섹션 ===== */
+.participants-container {
+  padding: 0 0 0 0;
 }
 
 .participant-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: white;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  font-size: 14px;
+  gap: 12px;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  border-radius: 0;
 }
 
-.speaking-indicator {
-  color: #e74c3c;
-  animation: bounce 0.5s infinite;
+.participant-item:hover {
+  background: #f8fafc;
 }
 
-.reconnect-button {
-  width: 100%;
-  padding: 15px;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.3s ease;
+.participant-item.current-user {
+  background: rgba(59, 130, 246, 0.03);
+  border-left-color: #3b82f6;
 }
 
-.reconnect-button:hover {
-  background: #2980b9;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-.icon-wrapper {
+.participant-avatar {
   position: relative;
-  display: inline-block;
+  flex-shrink: 0;
 }
 
-.status-dot {
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.status-indicator {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  top: -2px;
+  right: -2px;
   width: 12px;
   height: 12px;
-  background-color: #22c55e;
-  border-radius: 50%;
+  background: #10b981;
   border: 2px solid white;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
-.status-badge {
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 0.9em;
+.participant-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.participant-name {
   font-weight: 500;
-  position: relative;
+  color: #0f172a;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.you-badge {
+  font-size: 0.75rem;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* ===== 오디오 섹션 ===== */
+.audio-controls {
+  padding: 0 24px 20px 24px; /* 상단 패딩 제거 */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.audio-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.audio-toggle-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.audio-toggle-btn.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.btn-icon {
+  flex-shrink: 0;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.device-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #475569;
+  background: white;
+  cursor: pointer;
+}
+
+.device-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.audio-level {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-bar {
+  flex: 1;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 2px;
   overflow: hidden;
 }
 
-.status-text {
-  display: inline-block;
-  transition: opacity 0.3s ease;
+.level-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 2px;
+  transition: width 0.1s ease;
 }
 
-.status-icon {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.level-text {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  min-width: 32px;
+  text-align: right;
 }
 
-.status-badge:hover .status-text {
-  opacity: 0;
+/* ===== 녹음 섹션 ===== */
+.recording-controls {
+  padding: 0 24px 20px 24px; /* 상단 패딩 제거 */
 }
 
-.status-badge:hover .status-icon {
-  opacity: 1;
-}
-
-.status-badge:hover {
-  transform: scale(1.05);
-}
-
-.Connected:hover {
-  background: #219a52;
-}
-
-.Disconnected:hover {
-  background: #c0392b;
-}
-
-.Error:hover {
-  background: #d4ac0d;
-}
-
-.download-button {
-  padding: 10px 16px;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 13.9px;
+.record-button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.download-button:hover {
-  background: #2980b9;
+.record-button:hover:not(.disabled) {
+  border-color: #cbd5e1;
+  background: #f8fafc;
 }
 
-.download-buttons-centered {
-  display: flex;
-  justify-content: center; /* 중앙 정렬 */
-  gap: 10px;
-  margin-top: 20px;
+.record-button.recording {
+  border-color: #ef4444;
+  background: #fef2f2;
 }
 
-.recording-button:disabled {
-  background: #bdc3c7; /* 회색 배경 */
-  color: white; /* 텍스트 색 유지 */
-  cursor: not-allowed; /* 금지 표시 커서 */
-  opacity: 0.7; /* 시각적으로 흐리게 */
-  animation: none !important; /* pulse 애니메이션 비활성화 */
+.record-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.loading-overlay-in-card {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  background-color: rgba(245, 245, 250, 0.05);
-  backdrop-filter: blur(5px);
+.record-icon {
+  width: 48px;
+  height: 48px;
+  background: #ef4444;
   border-radius: 12px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex-direction: column;
-  z-index: 10;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
 }
 
-.processing-container {
+.record-button.recording .record-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.record-info {
+  flex: 1;
+  text-align: left;
+}
+
+.record-title {
+  display: block;
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.875rem;
+}
+
+.record-desc {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ===== 회의록 섹션 ===== */
+.transcript-section {
+  flex: 1;
+  min-height: 400px;
+}
+
+.header-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
+  gap: 8px;
 }
 
-.loading-spinner {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin-bottom: 5px;
+.action-btn {
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-/* 처리 중 텍스트 */
-.processing-text {
-  font-family: "Noto Sans KR", sans-serif;
-  font-size: 16px;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #475569;
+  font-size: 0.75rem;
   font-weight: 500;
-  color: #333;
-  margin-top: -15px;
-  opacity: 0.9;
-  animation: text-pulse 2s ease-in-out infinite;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* 진행 상태 표시줄 */
-.progress-bar-container {
+.action-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.action-btn.primary {
+  background: white;        /* 흰색 배경으로 변경 */
+  border-color: #e2e8f0;    /* 회색 테두리로 변경 */
+  color: #475569;           /* 회색 텍스트로 변경 */
+}
+
+.action-btn.primary:hover {
+  background: #f8fafc;      /* 호버 시 연한 회색 */
+  border-color: #cbd5e1;
+}
+
+.transcript-body {
+  flex: 1;
+  padding: 0 24px 24px 24px; /* 상단 패딩 제거 */
+  min-height: 350px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  text-align: center;
+}
+
+.loading-animation {
+  margin-bottom: 24px;
+}
+
+.loading-info h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.loading-info p {
+  color: #64748b;
+  margin: 0 0 24px 0;
+  font-size: 0.875rem;
+}
+
+.loading-progress {
   width: 200px;
-  height: 4px;
-  background-color: rgba(200, 200, 220, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 5px;
 }
 
 .progress-bar {
+  height: 2px;
+  background: #e2e8f0;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00c6ff, #0072ff, #7c3aed);
-  border-radius: 2px;
-  animation: progress-animation 2.5s ease-in-out infinite;
+  background: #3b82f6;
+  border-radius: 1px;
+  animation: progress 2s ease-in-out infinite;
 }
 
-/* 텍스트 펄스 애니메이션 */
-@keyframes text-pulse {
-  0%,
-  100% {
-    opacity: 0.9;
+@keyframes progress {
+  0% { width: 0; transform: translateX(-100%); }
+  50% { width: 100%; transform: translateX(0); }
+  100% { width: 0; transform: translateX(100%); }
+}
+
+.transcript-content {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 300px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* ===== 재연결 오버레이 ===== */
+.reconnect-overlay {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.reconnect-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: all 0.2s ease;
+}
+
+.reconnect-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes smooth-pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
   }
-  50% {
+  50% { 
     opacity: 0.6;
+    transform: scale(0.95);
   }
 }
 
-/* 진행 상태 표시줄 애니메이션 */
-@keyframes progress-animation {
-  0% {
-    width: 10%;
-    background-position: 0% 50%;
+/* ===== 반응형 ===== */
+@media (max-width: 480px) {
+  .meeting-interface {
+    max-width: 100%;
+    box-shadow: none;
   }
-  50% {
-    width: 70%;
-    background-position: 100% 50%;
+  
+  .header-content {
+    padding: 0 16px;
+    gap: 12px;
   }
-  100% {
-    width: 10%;
-    background-position: 0% 50%;
+  
+  .room-section {
+    min-width: 120px;
+  }
+  
+  .room-label {
+    font-size: 1rem;
+  }
+  
+  .live-badge {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    min-width: 45px;
+  }
+  
+  .controls-section {
+    min-width: 80px;
+  }
+  
+  .section-header {
+    padding: 20px 20px 12px 20px;
+  }
+  
+  .participant-item {
+    padding: 10px 20px;
+  }
+  
+  .audio-controls,
+  .recording-controls,
+  .transcript-body {
+    padding: 0 20px 16px 20px;
   }
 }
 </style>
