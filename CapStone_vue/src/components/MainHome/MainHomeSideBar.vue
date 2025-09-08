@@ -4,7 +4,7 @@
     <div class="sidebar">
       <div class="logo-container">
         <img src="/mindmap2.png" alt="마음지도 로고" class="logo-image" />
-        <h1 class="logo-text">마음지도</h1>
+        <h1 class="logo-text">MindRoad</h1>
       </div>
 
       <nav class="nav-menu">
@@ -248,7 +248,7 @@ export default {
 
 .logo-container {
   padding: 10px 0;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -321,7 +321,7 @@ export default {
 }
 
 .logo-image {
-  height: 45px;
+  height: 55px;
   width: auto;
   margin-bottom: 10px;
 }
