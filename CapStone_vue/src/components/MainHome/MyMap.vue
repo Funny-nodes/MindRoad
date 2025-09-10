@@ -5,967 +5,35 @@
 
     <!-- 콘텐츠 영역 -->
     <main class="content">
-      <div class="svg-container">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 800 495"
-          class="full-viewport-svg"
-          ref="svgRef"
+      <div class="lottie-container">
+        <!-- 첫 번째 Lottie 애니메이션 (배경) -->
+        <DotLottieVue
+          class="background-lottie"
+          :class="{ 'lottie-appear': showLottie }"
+          autoplay
+          loop
+          speed="0.9"
+          src="https://lottie.host/30c86abc-20f9-4679-a194-9b287cd1f8e7/DMPnrTxjuW.lottie"
+        />
+        
+        <!-- 두 번째 Lottie 애니메이션 (중앙) -->
+        <DotLottieVue
+          class="center-lottie"
+          :class="{ 'lottie-appear': showLottie }"
+          autoplay
+          loop
+          speed="0.7"
+          src="https://lottie.host/2e9e330c-4273-443b-b4d2-a7e5dcad051d/CeXM6eCbtf.lottie"
+        />
+        
+        <!-- 프로젝트 생성 버튼 -->
+        <button 
+          class="create-project-button"
+          @click="createAndOpenMap"
         >
-          <defs>
-            <!-- Enhanced Modern Background Gradient -->
-            <linearGradient
-              id="bg-gradient"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stop-color="#0A0E1F" />
-              <stop offset="100%" stop-color="#1A2044" />
-            </linearGradient>
-
-            <!-- Enhanced Node Gradients -->
-            <radialGradient
-              id="node-gradient-primary"
-              cx="50%"
-              cy="50%"
-              r="50%"
-            >
-              <stop offset="0%" stop-color="#4E7DF7" />
-              <stop offset="100%" stop-color="#2A4494" />
-            </radialGradient>
-
-            <radialGradient
-              id="node-gradient-secondary"
-              cx="50%"
-              cy="50%"
-              r="50%"
-            >
-              <stop offset="0%" stop-color="#FF9D2A" />
-              <stop offset="100%" stop-color="#E37B00" />
-            </radialGradient>
-
-            <!-- Enhanced Connection Gradient -->
-            <linearGradient
-              id="line-gradient"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="0%"
-            >
-              <stop offset="0%" stop-color="#4E7DF7" stop-opacity="0.5" />
-              <stop offset="50%" stop-color="#4E7DF7" stop-opacity="0.9" />
-              <stop offset="100%" stop-color="#4E7DF7" stop-opacity="0.5" />
-            </linearGradient>
-
-            <!-- Enhanced Tech Line Gradient -->
-            <linearGradient
-              id="tech-line-gradient"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="0%"
-            >
-              <stop offset="0%" stop-color="#4E7DF7" stop-opacity="0.7" />
-              <stop offset="50%" stop-color="#4E7DF7" stop-opacity="1" />
-              <stop offset="100%" stop-color="#4E7DF7" stop-opacity="0.7" />
-            </linearGradient>
-
-            <!-- Improved Glow Effect -->
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="6" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-
-            <!-- Digital circuit pattern -->
-            <pattern
-              id="circuit-pattern"
-              x="0"
-              y="0"
-              width="200"
-              height="200"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M10 10 L50 10 L50 50 L90 50"
-                stroke="#4E7DF7"
-                stroke-width="0.5"
-                fill="none"
-                opacity="0.15"
-              />
-              <path
-                d="M100 10 L140 10 L140 50 L180 50"
-                stroke="#4E7DF7"
-                stroke-width="0.5"
-                fill="none"
-                opacity="0.15"
-              />
-              <path
-                d="M10 100 L50 100 L50 140 L90 140"
-                stroke="#4E7DF7"
-                stroke-width="0.5"
-                fill="none"
-                opacity="0.15"
-              />
-              <path
-                d="M100 100 L140 100 L140 140 L180 140"
-                stroke="#4E7DF7"
-                stroke-width="0.5"
-                fill="none"
-                opacity="0.15"
-              />
-              <circle cx="50" cy="50" r="2" fill="#4E7DF7" opacity="0.15" />
-              <circle cx="150" cy="50" r="2" fill="#4E7DF7" opacity="0.15" />
-              <circle cx="50" cy="150" r="2" fill="#4E7DF7" opacity="0.15" />
-              <circle cx="150" cy="150" r="2" fill="#4E7DF7" opacity="0.15" />
-            </pattern>
-
-            <!-- Scanline effect -->
-            <pattern
-              id="scanline"
-              x="0"
-              y="0"
-              width="8"
-              height="8"
-              patternUnits="userSpaceOnUse"
-            >
-              <line
-                x1="0"
-                y1="1"
-                x2="800"
-                y2="1"
-                stroke="#FFFFFF"
-                stroke-width="0.2"
-                opacity="0.05"
-              />
-            </pattern>
-
-            <!-- Dotted grid pattern -->
-            <pattern
-              id="dot-grid"
-              patternUnits="userSpaceOnUse"
-              width="20"
-              height="20"
-            >
-              <circle cx="10" cy="10" r="0.5" fill="#4E7DF7" opacity="0.3" />
-            </pattern>
-          </defs>
-
-          <!-- Enhanced Background Layers (100px씩 위아래 확장) -->
-          <rect
-            x="0"
-            y="-100"
-            width="800"
-            height="695"
-            fill="url(#bg-gradient)"
-          />
-          <rect
-            x="0"
-            y="-100"
-            width="800"
-            height="695"
-            fill="url(#circuit-pattern)"
-          />
-          <rect x="0" y="-100" width="800" height="695" fill="url(#scanline)" />
-          <rect
-            x="0"
-            y="-100"
-            width="800"
-            height="695"
-            fill="url(#dot-grid)"
-            opacity="0.05"
-          />
-
-          <!-- Enhanced Tech Grid Lines -->
-          <g opacity="0.3">
-            <!-- Main horizontal lines -->
-            <line
-              x1="0"
-              y1="124"
-              x2="800"
-              y2="124"
-              stroke="#4E7DF7"
-              stroke-width="1"
-            />
-            <line
-              x1="0"
-              y1="248"
-              x2="800"
-              y2="248"
-              stroke="#4E7DF7"
-              stroke-width="1"
-            />
-            <line
-              x1="0"
-              y1="371"
-              x2="800"
-              y2="371"
-              stroke="#4E7DF7"
-              stroke-width="1"
-            />
-
-            <!-- Main vertical lines -->
-            <line
-              x1="200"
-              y1="0"
-              x2="200"
-              y2="495"
-              stroke="#4E7DF7"
-              stroke-width="1"
-            />
-            <line
-              x1="400"
-              y1="0"
-              x2="400"
-              y2="495"
-              stroke="#4E7DF7"
-              stroke-width="1"
-            />
-            <line
-              x1="600"
-              y1="0"
-              x2="600"
-              y2="495"
-              stroke="#4E7DF7"
-              stroke-width="1"
-            />
-          </g>
-
-          <!-- Central Node with enhanced look -->
-          <g>
-            <!-- Hexagon background for tech feel -->
-            <path
-              d="M400 208 L435 228 L435 268 L400 288 L365 268 L365 228 Z"
-              stroke="#FF9D2A"
-              stroke-width="0.8"
-              fill="none"
-              opacity="0.3"
-            >
-              <animate
-                attributeName="opacity"
-                values="0.3;0.1;0.3"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-            </path>
-
-            <circle
-              cx="400"
-              cy="248"
-              r="30"
-              fill="url(#node-gradient-secondary)"
-              filter="url(#glow)"
-            />
-            <circle
-              cx="400"
-              cy="248"
-              r="40"
-              fill="none"
-              stroke="#FF9D2A"
-              stroke-width="1.5"
-              opacity="0.6"
-            >
-              <animate
-                attributeName="r"
-                values="40;45;40"
-                dur="3s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values="0.6;0.2;0.6"
-                dur="3s"
-                repeatCount="indefinite"
-              />
-            </circle>
-          </g>
-
-          <!-- Enhanced Nodes and connections -->
-          <g id="connections">
-            <!-- Node 1 -->
-            <g>
-              <circle
-                cx="250"
-                cy="114"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <!-- Tech ring around node -->
-              <circle
-                cx="250"
-                cy="114"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.5s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path1"
-                d="M373.4 228.9 Q311 171 250 114"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
-                  <mpath xlink:href="#path1" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 2 -->
-            <g>
-              <circle
-                cx="550"
-                cy="114"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="550"
-                cy="114"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.7s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path2"
-                d="M426.6 228.9 Q488 171 550 114"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4.2s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion
-                  dur="4.2s"
-                  repeatCount="indefinite"
-                  rotate="auto"
-                >
-                  <mpath xlink:href="#path2" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 3 -->
-            <g>
-              <circle
-                cx="600"
-                cy="297"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="600"
-                cy="297"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.6s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path3"
-                d="M426.6 267.1 Q513 282 600 297"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4.1s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion
-                  dur="4.1s"
-                  repeatCount="indefinite"
-                  rotate="auto"
-                >
-                  <mpath xlink:href="#path3" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 4 -->
-            <g>
-              <circle
-                cx="500"
-                cy="376"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="500"
-                cy="376"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.9s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path4"
-                d="M414.1 274.6 Q457 325 500 376"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4.3s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion
-                  dur="4.3s"
-                  repeatCount="indefinite"
-                  rotate="auto"
-                >
-                  <mpath xlink:href="#path4" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 5 -->
-            <g>
-              <circle
-                cx="300"
-                cy="376"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="300"
-                cy="376"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.8s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path5"
-                d="M385.9 274.6 Q343 325 300 376"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4.3s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion
-                  dur="4.3s"
-                  repeatCount="indefinite"
-                  rotate="auto"
-                >
-                  <mpath xlink:href="#path5" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 6 -->
-            <g>
-              <circle
-                cx="200"
-                cy="297"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="200"
-                cy="297"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.4s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path6"
-                d="M373.4 267.1 Q286 282 200 297"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4.1s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion
-                  dur="4.1s"
-                  repeatCount="indefinite"
-                  rotate="auto"
-                >
-                  <mpath xlink:href="#path6" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 7 -->
-            <g>
-              <circle
-                cx="150"
-                cy="198"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="150"
-                cy="198"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.3s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path7"
-                d="M370.7 248 Q260 223 150 198"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
-                  <mpath xlink:href="#path7" />
-                </animateMotion>
-              </circle>
-            </g>
-
-            <!-- Node 8 -->
-            <g>
-              <circle
-                cx="650"
-                cy="198"
-                r="18"
-                fill="url(#node-gradient-primary)"
-                filter="url(#glow)"
-              />
-              <circle
-                cx="650"
-                cy="198"
-                r="22"
-                fill="none"
-                stroke="#4E7DF7"
-                stroke-width="0.8"
-                opacity="0.5"
-              >
-                <animate
-                  attributeName="opacity"
-                  values="0.5;0.2;0.5"
-                  dur="3.2s"
-                  repeatCount="indefinite"
-                />
-              </circle>
-              <path
-                id="path8"
-                d="M429.3 248 Q540 223 650 198"
-                stroke="url(#line-gradient)"
-                stroke-width="2"
-                fill="none"
-              >
-                <animate
-                  attributeName="stroke-width"
-                  values="2;2.5;2"
-                  dur="4s"
-                  repeatCount="indefinite"
-                />
-              </path>
-              <circle r="3" fill="#FFFFFF">
-                <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
-                  <mpath xlink:href="#path8" />
-                </animateMotion>
-              </circle>
-            </g>
-          </g>
-
-          <!-- Enhanced Tech circuit lines - more visible now -->
-          <g opacity="0.35">
-            <path
-              d="M20 69 L60 69 L60 119 L120 119 L120 169"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="5s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M780 69 L740 69 L740 119 L680 119 L680 169"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="5.5s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M20 426 L60 426 L60 376 L120 376 L120 326"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="5.2s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M780 426 L740 426 L740 376 L680 376 L680 326"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="5.7s"
-                repeatCount="indefinite"
-              />
-            </path>
-
-            <!-- Additional tech circuit lines -->
-            <path
-              d="M100 27 L100 67 L150 67 L150 107"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="4.8s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M700 27 L700 67 L650 67 L650 107"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="5.3s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M100 468 L100 428 L150 428 L150 388"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="5.1s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M700 468 L700 428 L650 428 L650 388"
-              stroke="url(#tech-line-gradient)"
-              stroke-width="1.2"
-              fill="none"
-            >
-              <animate
-                attributeName="stroke-width"
-                values="1.2;1.6;1.2"
-                dur="4.9s"
-                repeatCount="indefinite"
-              />
-            </path>
-          </g>
-
-          <!-- Enhanced Pulse Rings -->
-          <circle
-            cx="400"
-            cy="248"
-            r="60"
-            fill="none"
-            stroke="#FF9D2A"
-            stroke-width="1"
-            opacity="0"
-          >
-            <animate
-              attributeName="r"
-              values="35;150;35"
-              dur="4s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              values="0.7;0;0.7"
-              dur="4s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="stroke-width"
-              values="1;0.5;1"
-              dur="4s"
-              repeatCount="indefinite"
-            />
-          </circle>
-
-          <circle
-            cx="400"
-            cy="248"
-            r="60"
-            fill="none"
-            stroke="#4E7DF7"
-            stroke-width="1"
-            opacity="0"
-          >
-            <animate
-              attributeName="r"
-              values="35;130;35"
-              dur="5s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              values="0.7;0;0.7"
-              dur="5s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="stroke-width"
-              values="1;0.5;1"
-              dur="5s"
-              repeatCount="indefinite"
-            />
-          </circle>
-
-          <!-- Additional tech particles -->
-          <g opacity="0.5">
-            <circle cx="300" cy="99" r="1.5" fill="#4E7DF7">
-              <animate
-                attributeName="cy"
-                values="99;109;99"
-                dur="5s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="cx"
-                values="300;310;300"
-                dur="5s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values="0.5;0.8;0.5"
-                dur="5s"
-                repeatCount="indefinite"
-              />
-            </circle>
-            <circle cx="500" cy="99" r="1.5" fill="#4E7DF7">
-              <animate
-                attributeName="cy"
-                values="99;89;99"
-                dur="6s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="cx"
-                values="500;490;500"
-                dur="6s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values="0.5;0.8;0.5"
-                dur="6s"
-                repeatCount="indefinite"
-              />
-            </circle>
-            <circle cx="350" cy="391" r="1.5" fill="#4E7DF7">
-              <animate
-                attributeName="cy"
-                values="391;401;391"
-                dur="7s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="cx"
-                values="350;360;350"
-                dur="7s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values="0.5;0.8;0.5"
-                dur="7s"
-                repeatCount="indefinite"
-              />
-            </circle>
-            <circle cx="450" cy="391" r="1.5" fill="#4E7DF7">
-              <animate
-                attributeName="cy"
-                values="391;381;391"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="cx"
-                values="450;440;450"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values="0.5;0.8;0.5"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-            </circle>
-          </g>
-          <g
-            id="empty-map-button"
-            transform="translate(400, 445)"
-            class="svg-button"
-            @click="createAndOpenMap"
-          >
-            <!-- 배경 -->
-            <rect
-              x="-70"
-              y="-16"
-              width="140"
-              height="32"
-              rx="16"
-              ry="16"
-              class="btn-bg"
-            />
-
-            <!-- 테두리 -->
-            <rect
-              x="-70"
-              y="-16"
-              width="140"
-              height="32"
-              rx="16"
-              ry="16"
-              class="btn-border"
-            />
-
-            <!-- 텍스트 -->
-            <text
-              x="0"
-              y="5"
-              font-family="Arial, sans-serif"
-              font-size="13"
-              class="btn-text"
-              text-anchor="middle"
-            >
-              프로젝트 생성
-            </text>
-          </g>
-        </svg>
+          <span class="button-text">프로젝트 생성</span>
+          <div class="button-glow"></div>
+        </button>
       </div>
 
       <!-- 주제 선택 모달 -->
@@ -1010,6 +78,7 @@
 <script>
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import MainHomeSideBar from "./MainHomeSideBar.vue";
+import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
 import { connectSocket } from "../socket/socket";
 import { createProject } from "../../api/projectApi";
 import { useRouter } from "vue-router";
@@ -1018,11 +87,10 @@ export default {
   name: "MyMap",
   components: {
     MainHomeSideBar,
+    DotLottieVue,
   },
   setup() {
     const router = useRouter();
-    const svgContainerRef = ref(null);
-    const svgRef = ref(null);
 
     // 세션에서 userId 가져오기
     const userId = sessionStorage.getItem("userId");
@@ -1035,6 +103,9 @@ export default {
       "의학 및 의료정보",
       "법률 및 행정",
     ];
+
+    // Lottie 등장 애니메이션 상태
+    const showLottie = ref(false);
 
     const handleTopicSubmit = async () => {
       if (!selectedTopic.value) {
@@ -1070,31 +141,6 @@ export default {
       showTopicModal.value = true;
     };
 
-    // SVG를 사이드바를 제외한 전체 영역에 맞추기 위한 함수
-    const adjustSvgSize = () => {
-      const svgElement = svgRef.value;
-      if (svgElement) {
-        // 사이드바 너비 (이미 content에 패딩으로 적용되어 있음)
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // SVG 크기 설정 (전체 너비에 맞춤)
-        svgElement.setAttribute("width", "100%");
-        svgElement.setAttribute("height", viewportHeight);
-
-        // 뷰박스 비율 조정
-        const aspectRatio = 800 / 495;
-        const availableWidth = viewportWidth; // 사이드바는 이미 패딩으로 처리되어 있음
-        const newHeight = availableWidth / aspectRatio;
-
-        if (newHeight < viewportHeight) {
-          svgElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
-        } else {
-          svgElement.setAttribute("preserveAspectRatio", "xMidYMid slice");
-        }
-      }
-    };
-
     // 휠 이벤트 처리를 위한 변수
     let isScrolling = false;
     let scrollTimeout;
@@ -1127,11 +173,10 @@ export default {
         console.log("소켓 연결 완료");
       });
 
-      // 초기 SVG 크기 조정
-      adjustSvgSize();
-
-      // 윈도우 리사이즈 이벤트에 반응하여 SVG 크기 재조정
-      window.addEventListener("resize", adjustSvgSize);
+      // Lottie 진입 애니메이션 트리거
+      setTimeout(() => {
+        showLottie.value = true;
+      }, 130);
 
       // 휠 이벤트 리스너 등록
       window.addEventListener("wheel", handleWheel, { passive: false });
@@ -1140,19 +185,17 @@ export default {
     onBeforeUnmount(() => {
       // 컴포넌트 언마운트 시 이벤트 리스너 제거 및 타이머 정리
       window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("resize", adjustSvgSize);
       clearTimeout(scrollTimeout);
     });
 
     return {
       createAndOpenMap,
-      svgContainerRef,
-      svgRef,
       showTopicModal,
       selectedTopic,
       topicOptions,
       handleTopicSubmit,
       handleCancel,
+      showLottie,
     };
   },
   mounted() {
@@ -1179,75 +222,158 @@ export default {
   flex-direction: column;
   height: 100%;
   position: relative;
-  margin-left: 0; /* 0으로 변경 */
-  box-sizing: border-box; /* 박스 크기에 패딩과 테두리 포함 */
+  margin-left: 0;
+  box-sizing: border-box;
 }
 
-.svg-container {
+.lottie-container {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
-  margin: 0; /* 마진 제거 */
-  padding: 0; /* 패딩 제거 */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0A0E1F 0%, #1A2044 100%);
 }
 
-/* SVG 전체 화면 설정 */
-.full-viewport-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  margin: 0; /* 마진 제거 */
-  padding: 0; /* 패딩 제거 */
+/* Lottie 등장 애니메이션 (fade + scale) */
+.background-lottie,
+.center-lottie {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 1s cubic-bezier(0.23,1,0.32,1), transform 1s cubic-bezier(0.23,1,0.32,1);
+}
+.lottie-appear {
+  opacity: 1 !important;
+  transform: scale(1) !important;
 }
 
-/* 나머지 스타일은 동일하게 유지 */
-.svg-button {
+/* 배경 Lottie 애니메이션 */
+.background-lottie {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1;
+}
+
+/* 중앙 Lottie 애니메이션 - 크기 증가 */
+.center-lottie {
+  position: relative;
+  width: 550px !important;
+  height: 550px !important;
+  z-index: 2;
+}
+
+/* 🌌 조화로운 우주 테마의 프로젝트 생성 버튼 */
+.create-project-button {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  
+  /* 기본 스타일 */
+  padding: 16px 32px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  overflow: hidden;
+  
+  /* 🎨 조화로운 블루-퍼플 그라데이션 (지구본과 우주 테마에 어울림) */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  
+  /* 🌟 은은한 그림자 효과 */
+  box-shadow: 
+    0 8px 32px rgba(102, 126, 234, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    
+  /* 🎭 부드러운 애니메이션 */
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  
+  /* 3D 효과 */
+  transform-style: preserve-3d;
 }
 
-.btn-bg {
-  fill: #000000;
-  opacity: 0.2;
-  transition: all 0.3s ease;
+/* 버튼 텍스트 */
+.button-text {
+  position: relative;
+  z-index: 2;
+  display: block;
 }
 
-.btn-border {
-  fill: none;
-  stroke: #ffffff;
-  stroke-width: 1.5;
-  transition: all 0.3s ease;
+/* 글로우 효과 */
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transform: translateX(-100%) skewX(-15deg);
+  transition: transform 0.6s ease;
+  z-index: 1;
 }
 
-.btn-text {
-  fill: #ffffff;
-  transition: all 0.3s ease;
+/* 호버 효과 */
+.create-project-button:hover {
+  /* 🔮 더 생동감 있는 그라데이션 */
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  
+  /* ✨ 강화된 그림자 */
+  box-shadow: 
+    0 12px 48px rgba(102, 126, 234, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    
+  /* 🚀 부드러운 상승 효과 */
+  transform: translateX(-50%) translateY(-4px) scale(1.02);
 }
 
-.svg-button:hover .btn-bg {
-  fill: #ffffff;
-  opacity: 1;
+/* 호버 시 글로우 애니메이션 */
+.create-project-button:hover .button-glow {
+  transform: translateX(100%) skewX(-15deg);
 }
 
-.svg-button:hover .btn-text {
-  fill: rgb(56, 72, 177);
+/* 클릭 효과 */
+.create-project-button:active {
+  transform: translateX(-50%) translateY(-2px) scale(0.98);
+  box-shadow: 
+    0 6px 24px rgba(102, 126, 234, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-@media (max-width: 768px) {
-  .content {
-    margin-left: 0;
-    padding-left: 0; /* 모바일에서 패딩도 제거 */
+/* 🎯 은은한 펄스 애니메이션 */
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
   }
-
-  .svg-container {
-    margin: 0;
-    width: 100%;
+  50% {
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.35);
+  }
+  100% {
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
   }
 }
+
+.create-project-button {
+  animation: softPulse 3s ease-in-out infinite;
+}
+
+/* 모달 관련 스타일 - 두 번째 코드의 간단한 디자인 적용 */
 .modal-overlay {
-  position: absolute; /* fixed → absolute */
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -1277,7 +403,7 @@ export default {
   text-align: center;
   font-weight: bold;
   font-size: 18px;
-  margin-bottom: 16px; /* 제목과 라디오 사이 줄바꿈 */
+  margin-bottom: 16px;
   color: #3d7bff;
 }
 
@@ -1287,7 +413,7 @@ export default {
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 20px;
-  padding-left: 1rem; /* 라디오 버튼 여백 */
+  padding-left: 1rem;
 }
 
 .radio-label {
@@ -1344,5 +470,51 @@ export default {
 .cancel-btn:hover {
   background-color: #444;
   color: #fff;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
+  .center-lottie {
+    width: 500px !important;
+    height: 500px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  .center-lottie {
+    width: 400px !important;
+    height: 400px !important;
+  }
+
+  .create-project-button {
+    bottom: 60px;
+    padding: 14px 28px;
+    font-size: 15px;
+  }
+
+  .modal-content {
+    margin: 20px;
+    min-width: auto;
+    width: calc(100% - 40px);
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .center-lottie {
+    width: 300px !important;
+    height: 300px !important;
+  }
+  
+  .create-project-button {
+    bottom: 40px;
+    padding: 12px 24px;
+    font-size: 14px;
+  }
 }
 </style>
