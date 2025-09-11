@@ -12,7 +12,7 @@
           :class="{ 'lottie-appear': showLottie }"
           autoplay
           loop
-          speed="0.9"
+          :speed="0.9"
           src="https://lottie.host/30c86abc-20f9-4679-a194-9b287cd1f8e7/DMPnrTxjuW.lottie"
         />
         
@@ -22,7 +22,7 @@
           :class="{ 'lottie-appear': showLottie }"
           autoplay
           loop
-          speed="0.7"
+          :speed="0.7"
           src="https://lottie.host/2e9e330c-4273-443b-b4d2-a7e5dcad051d/CeXM6eCbtf.lottie"
         />
         
@@ -236,7 +236,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0A0E1F 0%, #1A2044 100%);
+  background: linear-gradient(135deg, #080c1b 0%, #181e3d 100%);
 }
 
 /* Lottie 등장 애니메이션 (fade + scale) */
