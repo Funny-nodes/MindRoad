@@ -69,7 +69,9 @@ async function postWithRetry(path, payload) {
  */
 async function askOpenAI(speakerSpeech, speakerNames, nodeData, isRealTime = false) {
   try {
-    if (!speakerSpeech || !speakerNames) return;
+    if (!speakerSpeech || !speakerNames) {
+      return;
+    }
 
     const payload = { speakerSpeech, speakerNames, nodeData, isRealTime };
     const jsonResponse = await postWithRetry("/convsum", payload);
@@ -93,16 +95,22 @@ async function askOpenAI(speakerSpeech, speakerNames, nodeData, isRealTime = fal
       jsonResponse.keywords = unique;
     }
 
+    // 최종 응답만 출력
+    console.log(`\n🎉 ========== 최종 응답 ==========`);
+    console.log(JSON.stringify(jsonResponse, null, 2));
+
     return jsonResponse;
   } catch (error) {
     // 터널 503 등 상세 로그
     const status = error?.response?.status;
     const body = error?.response?.data;
+    console.error(`\n💀 ========== askOpenAI 최종 오류 ==========`);
     console.error(
       "어댑터 호출 오류:",
       status ? `HTTP ${status}` : error?.code || error?.message,
       body ? `\n응답본문: ${JSON.stringify(body).slice(0, 500)}` : ""
     );
+    console.error(`💀 ========== askOpenAI 오류 종료 ==========\n`);
     return null;
   }
 }
