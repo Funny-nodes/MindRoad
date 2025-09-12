@@ -1035,7 +1035,7 @@ export default {
       const date = `${year}.${month}.${day}`;
 
       link.href = pdfUrl;
-      link.download = `${date}-${this.rootNode}.pdf`;
+      link.download = `${date}-${this.rootNode.name}.pdf`;
       link.click();
       URL.revokeObjectURL(pdfUrl);
     },
