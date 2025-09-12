@@ -120,14 +120,14 @@ export default async function meetingPDF2(data) {
   });
 
   // 🔑 키워드
-  autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 16,
-    head: [[{ content: "주요 키워드", styles: { halign: "center" } }]],
-    body: minutes.keywords.map((k) => [k]),
-    headStyles: { font: "NotoSansKR", fontStyle: "bold",fillColor: "#1abd9c" },
-    theme: "striped",
-    styles: { font: "NotoSansKR", fontStyle: "normal", halign: "left" },
-  });
+  // autoTable(doc, {
+  //   startY: doc.lastAutoTable.finalY + 16,
+  //   head: [[{ content: "주요 키워드", styles: { halign: "center" } }]],
+  //   body: minutes.keywords.map((k) => [k]),
+  //   headStyles: { font: "NotoSansKR", fontStyle: "bold",fillColor: "#1abd9c" },
+  //   theme: "striped",
+  //   styles: { font: "NotoSansKR", fontStyle: "normal", halign: "left" },
+  // });
 
   return doc;
 }
