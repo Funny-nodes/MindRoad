@@ -588,3 +588,14 @@ exports.updateProjectCategory = async (project_id, category) => {
     throw error;
   }
 };
+
+// 프로젝트 카테고리 이름만 반환
+exports.getProjectCategoryName = async (project_id) => {
+  if (!project_id) throw new Error("project_id가 필요합니다.");
+
+  const project = await projectRepository.getProjectById(project_id);
+  if (!project) throw new Error("프로젝트를 찾을 수 없습니다.");
+
+  // DB에 category 컬럼이 없다면 null 반환
+  return project.category ?? null;
+};
