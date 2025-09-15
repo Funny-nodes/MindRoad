@@ -97,11 +97,13 @@ exports.processIndividualFile = async (
         false
       );
       // 필요 시 openAIResponse.minutes.keywords를 이용한 추가 삽입 로직을 여기에 붙여도 됨
+
+      if (nodeData && nodeData.length > 0) {
+        openAIResponse.rootNode = nodeData[0];
+      }
     }
 
-    if (openAIResponse && nodeData.length > 0) {
-      openAIResponse.rootNode = nodeData[0];
-    }
+    
 
     const audioType = isRealTime ? "realTime" : "meeting";
     const userTempFolder = path.join(tempAudioFolder, audioType, roomId);
@@ -116,7 +118,9 @@ exports.processIndividualFile = async (
 
     const mixedAudioPath = await mixAudio(userAudioFolder, userAudioFolder);
 
-    // 정리
+    
+
+    // 파일 삭제
     deleteFiles(userTempFolder);
     deleteFiles(userAudioFolder); // 혼합 파일까지 지워질 수 있으니 필요 시 분리 정리 유틸 권장
 
