@@ -73,9 +73,7 @@ exports.processIndividualFile = async (
       isRealTime
     );
 
-    if (nodeData && nodeData.length > 0) {
-      openAIResponse.rootNode = nodeData[0];
-    }
+    
 
     // 🔽 이 부분 추가: 키워드가 있으면 바로 노드 생성
     let addedNodes = null;
@@ -104,6 +102,10 @@ exports.processIndividualFile = async (
     }
 
     const mixedAudioPath = await mixAudio(userAudioFolder, userAudioFolder);
+
+    if (nodeData && nodeData.length > 0) {
+      openAIResponse.rootNode = nodeData[0];
+    }
 
     // 파일 삭제
     deleteFiles(userTempFolder);
