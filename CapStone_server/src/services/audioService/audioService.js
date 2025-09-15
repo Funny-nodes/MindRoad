@@ -97,6 +97,10 @@ exports.processIndividualFile = async (
         false
       );
       // 필요 시 openAIResponse.minutes.keywords를 이용한 추가 삽입 로직을 여기에 붙여도 됨
+
+      if (nodeData && nodeData.length > 0) {
+        openAIResponse.rootNode = nodeData[0];
+      }
     }
 
     
@@ -114,9 +118,7 @@ exports.processIndividualFile = async (
 
     const mixedAudioPath = await mixAudio(userAudioFolder, userAudioFolder);
 
-    if (nodeData && nodeData.length > 0) {
-      openAIResponse.rootNode = nodeData[0];
-    }
+    
 
     // 파일 삭제
     deleteFiles(userTempFolder);
