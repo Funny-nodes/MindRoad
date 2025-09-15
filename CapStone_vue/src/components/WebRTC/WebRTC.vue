@@ -5,7 +5,13 @@
         <div class="logo-section">
           <div class="brand-icon">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2"/>
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
             <i class="fa-solid fa-microphone-lines"></i>
           </div>
@@ -32,17 +38,28 @@
               <span>LIVE</span>
             </div>
           </div>
-          
+
           <div class="header-spacer"></div>
-          
+
           <div class="controls-section">
             <div class="participant-indicator">
-              <i class="fa-solid fa-user-group" style="font-size: 13px;"></i>
+              <i class="fa-solid fa-user-group" style="font-size: 13px"></i>
               <span class="count-text">{{ participants.length }}명</span>
             </div>
-            <button @click="leaveRoom()" class="exit-button" :class="connectionStatus.toLowerCase()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+            <button
+              @click="leaveRoom()"
+              class="exit-button"
+              :class="connectionStatus.toLowerCase()"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                />
               </svg>
             </button>
           </div>
@@ -51,23 +68,22 @@
 
       <!-- 메인 콘텐츠 - 세로 배치, 정적 위치 -->
       <main class="meeting-content">
-
         <!-- 참여자 섹션 -->
         <section class="content-section participants-section">
-          
-          
           <div class="participants-container">
             <div
-                v-for="id in participants"
-                :key="id"
-                class="participant-item"
-                :class="{ 'current-user': id === currentUserId }"
-              >
+              v-for="id in participants"
+              :key="id"
+              class="participant-item"
+              :class="{ 'current-user': id === currentUserId }"
+            >
               <div class="participant-avatar">
-                <div class="avatar-circle">{{ getUserDisplayName(id).charAt(0) }}</div>
+                <div class="avatar-circle">
+                  {{ getUserDisplayName(id).charAt(0) }}
+                </div>
                 <div class="status-indicator"></div>
               </div>
-              
+
               <div class="participant-info">
                 <div class="participant-name">
                   {{ getUserDisplayName(id) }}
@@ -86,16 +102,28 @@
               {{ isMuted ? "음소거" : "활성" }}
             </span>
           </div>
-          
+
           <div class="audio-controls">
-            <button @click="toggleMute" class="audio-toggle-btn" :class="{ active: !isMuted }">
+            <button
+              @click="toggleMute"
+              class="audio-toggle-btn"
+              :class="{ active: !isMuted }"
+            >
               <div class="btn-icon">
-                <i v-if="isMuted" class="fa-solid fa-volume-low" style="font-size: 16px;"></i>
-                <i v-else class="fa-solid fa-volume-xmark" style="font-size: 16px;"></i>
+                <i
+                  v-if="isMuted"
+                  class="fa-solid fa-volume-low"
+                  style="font-size: 16px"
+                ></i>
+                <i
+                  v-else
+                  class="fa-solid fa-volume-xmark"
+                  style="font-size: 16px"
+                ></i>
               </div>
               <span>{{ isMuted ? "음소거 해제" : "음소거" }}</span>
             </button>
-            
+
             <div class="control-group">
               <label class="control-label">오디오 장치</label>
               <select
@@ -104,17 +132,26 @@
                 :disabled="isRecording"
                 class="device-select"
               >
-                <option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
-                  {{ device.label || `장치 ${device.deviceId.substr(0, 8)}...` }}
+                <option
+                  v-for="device in audioDevices"
+                  :key="device.deviceId"
+                  :value="device.deviceId"
+                >
+                  {{
+                    device.label || `장치 ${device.deviceId.substr(0, 8)}...`
+                  }}
                 </option>
               </select>
             </div>
-            
+
             <div class="control-group">
               <label class="control-label">음성 레벨</label>
               <div class="audio-level">
                 <div class="level-bar">
-                  <div class="level-fill" :style="{ width: `${audioLevel}%` }"></div>
+                  <div
+                    class="level-fill"
+                    :style="{ width: `${audioLevel}%` }"
+                  ></div>
                 </div>
                 <span class="level-text">{{ Math.round(audioLevel) }}%</span>
               </div>
@@ -130,30 +167,46 @@
               {{ isRecording ? "녹음 중" : "대기" }}
             </span>
           </div>
-          
+
           <div class="recording-controls">
             <button
               @click="toggleRecording"
               class="record-button"
-              :class="{ 
+              :class="{
                 recording: isRecording,
-                disabled: isProcessingRecording 
+                disabled: isProcessingRecording,
               }"
               :disabled="isProcessingRecording"
             >
               <div class="record-icon">
-                <svg v-if="isRecording" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="6" width="12" height="12" rx="2"/>
+                <svg
+                  v-if="isRecording"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
                 </svg>
-                <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="12" r="10"/>
-                  <circle cx="12" cy="12" r="3"/>
+                <svg
+                  v-else
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="3" />
                 </svg>
               </div>
-              
+
               <div class="record-info">
-                <span class="record-title">{{ isRecording ? "녹음 중지" : "녹음 시작" }}</span>
-                <span class="record-desc">{{ isRecording ? "클릭하여 중지" : "회의 내용을 기록합니다" }}</span>
+                <span class="record-title">{{
+                  isRecording ? "녹음 중지" : "녹음 시작"
+                }}</span>
+                <span class="record-desc">{{
+                  isRecording ? "클릭하여 중지" : "회의 내용을 기록합니다"
+                }}</span>
               </div>
             </button>
           </div>
@@ -165,16 +218,16 @@
             <h2 class="section-title">회의록</h2>
             <div class="header-actions" v-if="!isLoading">
               <button class="action-btn" @click="downloadAudio">
-                <i class="fa-solid fa-file-audio" style="font-size: 14px;"></i>
+                <i class="fa-solid fa-file-audio" style="font-size: 14px"></i>
                 음성파일
               </button>
               <button class="action-btn primary" @click="downloadPDF">
-                <i class="fa-solid fa-file" style="font-size: 13.5px;"></i>
+                <i class="fa-solid fa-file" style="font-size: 13.5px"></i>
                 PDF
               </button>
             </div>
           </div>
-          
+
           <div class="transcript-body">
             <!-- 로딩 상태 -->
             <div v-if="isLoading" class="loading-container">
@@ -199,7 +252,11 @@
             </div>
 
             <!-- 회의록 내용 -->
-            <div v-else class="transcript-content" v-html="meetingContent"></div>
+            <div
+              v-else
+              class="transcript-content"
+              v-html="meetingContent"
+            ></div>
           </div>
         </section>
       </main>
@@ -208,7 +265,9 @@
       <div v-if="connectionStatus === 'disconnected'" class="reconnect-overlay">
         <button @click="reconnect" class="reconnect-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 12a8 8 0 0 1 8-8V2.5L16 6l-4 3.5V8a6 6 0 1 0 6 6h2a8 8 0 0 1-16 0z"/>
+            <path
+              d="M4 12a8 8 0 0 1 8-8V2.5L16 6l-4 3.5V8a6 6 0 1 0 6 6h2a8 8 0 0 1-16 0z"
+            />
           </svg>
           다시 연결
         </button>
@@ -506,16 +565,16 @@ export default {
 
         this.recordedChunks.push(event.data);
 
-        // if (blob.size > 0 && this.mediaRecorder.state === "recording") {
-        //   try {
-        //     await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
-        //     console.log("✅ 업로드 성공");
-        //   } catch (err) {
-        //     console.error("❌ 업로드 실패:", err.message);
-        //   }
-        // } else {
-        //   console.warn("🚫 실시간 종료");
-        // }
+        if (blob.size > 0 && this.mediaRecorder.state === "recording") {
+          try {
+            await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
+            console.log("✅ 업로드 성공");
+          } catch (err) {
+            console.error("❌ 업로드 실패:", err.message);
+          }
+        } else {
+          console.warn("🚫 실시간 종료");
+        }
       };
 
       this.uploadInterval = setInterval(async () => {
@@ -1119,7 +1178,8 @@ export default {
 }
 
 #app {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica,
+    Arial, sans-serif;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -1141,14 +1201,22 @@ export default {
 
 /* 다크모드 배경 장식 */
 .login-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%);
+  background: radial-gradient(
+      circle at 20% 80%,
+      rgba(59, 130, 246, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(147, 51, 234, 0.15) 0%,
+      transparent 50%
+    );
   pointer-events: none;
 }
 
@@ -1176,11 +1244,11 @@ export default {
   color: white;
   margin-bottom: 24px;
   box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3),
-              0 0 20px rgba(59, 130, 246, 0.2);
+    0 0 20px rgba(59, 130, 246, 0.2);
 }
 
 .brand-icon::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -1194,8 +1262,15 @@ export default {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { transform: scale(1); opacity: 0.3; }
-  50% { transform: scale(1.1); opacity: 0.5; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
 }
 
 .brand-icon i {
@@ -1229,7 +1304,7 @@ export default {
 .join-btn {
   width: 85%;
   height: 52px;
-  margin: 0 auto; 
+  margin: 0 auto;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border: none;
@@ -1248,7 +1323,7 @@ export default {
 }
 
 .join-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1750,13 +1825,13 @@ export default {
 }
 
 .action-btn.primary {
-  background: white;        /* 흰색 배경으로 변경 */
-  border-color: #e2e8f0;    /* 회색 테두리로 변경 */
-  color: #475569;           /* 회색 텍스트로 변경 */
+  background: white; /* 흰색 배경으로 변경 */
+  border-color: #e2e8f0; /* 회색 테두리로 변경 */
+  color: #475569; /* 회색 텍스트로 변경 */
 }
 
 .action-btn.primary:hover {
-  background: #f8fafc;      /* 호버 시 연한 회색 */
+  background: #f8fafc; /* 호버 시 연한 회색 */
   border-color: #cbd5e1;
 }
 
@@ -1812,9 +1887,18 @@ export default {
 }
 
 @keyframes progress {
-  0% { width: 0; transform: translateX(-100%); }
-  50% { width: 100%; transform: translateX(0); }
-  100% { width: 0; transform: translateX(100%); }
+  0% {
+    width: 0;
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0);
+  }
+  100% {
+    width: 0;
+    transform: translateX(100%);
+  }
 }
 
 .transcript-content {
@@ -1859,16 +1943,22 @@ export default {
 
 /* ===== 애니메이션 ===== */
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes smooth-pulse {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 0.6;
     transform: scale(0.95);
   }
@@ -1880,38 +1970,38 @@ export default {
     max-width: 100%;
     box-shadow: none;
   }
-  
+
   .header-content {
     padding: 0 16px;
     gap: 12px;
   }
-  
+
   .room-section {
     min-width: 120px;
   }
-  
+
   .room-label {
     font-size: 1rem;
   }
-  
+
   .live-badge {
     font-size: 0.7rem;
     padding: 3px 6px;
     min-width: 45px;
   }
-  
+
   .controls-section {
     min-width: 80px;
   }
-  
+
   .section-header {
     padding: 20px 20px 12px 20px;
   }
-  
+
   .participant-item {
     padding: 10px 20px;
   }
-  
+
   .audio-controls,
   .recording-controls,
   .transcript-body {
