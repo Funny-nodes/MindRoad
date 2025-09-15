@@ -99,9 +99,7 @@ exports.processIndividualFile = async (
       // 필요 시 openAIResponse.minutes.keywords를 이용한 추가 삽입 로직을 여기에 붙여도 됨
     }
 
-    if (openAIResponse && nodeData.length > 0) {
-      openAIResponse.rootNode = nodeData[0];
-    }
+    
 
     const audioType = isRealTime ? "realTime" : "meeting";
     const userTempFolder = path.join(tempAudioFolder, audioType, roomId);
