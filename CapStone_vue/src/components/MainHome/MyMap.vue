@@ -81,7 +81,7 @@ import MainHomeSideBar from "./MainHomeSideBar.vue";
 import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
 import { connectSocket } from "../socket/socket";
 import { createProject } from "../../api/projectApi";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 export default {
   name: "MyMap",
@@ -91,6 +91,7 @@ export default {
   },
   setup() {
     const router = useRouter();
+    const route = useRoute();
 
     // 세션에서 userId 가져오기
     const userId = sessionStorage.getItem("userId");
@@ -145,22 +146,37 @@ export default {
     let isScrolling = false;
     let scrollTimeout;
 
+    // 스크롤 강제 멈춤(락) 변수 추가
+    let forceLockTimeout = null;
+    const forceLock = ref(false);
+
     // 휠 이벤트 핸들러
     const handleWheel = (event) => {
+      // 강제 락이 걸려있으면 무시
+      if (forceLock.value) return;
+
       // 이미 스크롤 중이면 추가 이벤트 무시
       if (isScrolling) return;
 
       // 아래로 스크롤하는 경우 (deltaY가 양수)
       if (event.deltaY > 50) {
         isScrolling = true;
-
-        // 연속된 스크롤 이벤트 방지를 위한 디바운싱
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
           console.log("아래로 스크롤 감지, Recent 페이지로 이동합니다");
           router.push("/Recent");
-
-          // 스크롤 상태 초기화 (다음 페이지에서 정상 작동하도록)
+          setTimeout(() => {
+            isScrolling = false;
+          }, 500);
+        }, 300);
+      }
+      // 위로 스크롤하는 경우 (deltaY가 음수)
+      else if (event.deltaY < -50) {
+        isScrolling = true;
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          console.log("위로 스크롤 감지, / (루트) 페이지로 이동합니다");
+          router.push("/");
           setTimeout(() => {
             isScrolling = false;
           }, 500);
@@ -168,24 +184,41 @@ export default {
       }
     };
 
+    // 페이지 진입 시 0.5초간 스크롤 강제 멈춤
+    const activateForceLock = () => {
+      forceLock.value = true;
+      if (forceLockTimeout) clearTimeout(forceLockTimeout);
+      forceLockTimeout = setTimeout(() => {
+        forceLock.value = false;
+      }, 500);
+    };
+
     onMounted(() => {
       connectSocket(() => {
         console.log("소켓 연결 완료");
       });
 
-      // Lottie 진입 애니메이션 트리거
       setTimeout(() => {
         showLottie.value = true;
       }, 130);
 
-      // 휠 이벤트 리스너 등록
       window.addEventListener("wheel", handleWheel, { passive: false });
+
+      // 마운트(즉, MyMap 진입) 시 무조건 1초간 스크롤 금지
+      activateForceLock();
+
+      // 라우트 변경 감지하여 MyMap 진입 시도에도 락을 걸어줌 (SPA 환경 대응)
+      // (만약 <router-view>에서 재사용될 경우를 대비)
+      // - 라우트 진입마다 락을 거는 효과
+      if (route && route.name === "MyMap") {
+        activateForceLock();
+      }
     });
 
     onBeforeUnmount(() => {
-      // 컴포넌트 언마운트 시 이벤트 리스너 제거 및 타이머 정리
       window.removeEventListener("wheel", handleWheel);
       clearTimeout(scrollTimeout);
+      if (forceLockTimeout) clearTimeout(forceLockTimeout);
     });
 
     return {
@@ -199,7 +232,6 @@ export default {
     };
   },
   mounted() {
-    // 페이지 로드 시 소켓 연결
     connectSocket(() => {
       console.log("소켓 연결 완료");
     });

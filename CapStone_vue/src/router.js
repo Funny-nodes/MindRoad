@@ -7,15 +7,19 @@ import MyMap from "./components/MainHome/MyMap.vue";
 import Register from "./components/User/Register.vue";
 import Login from "./components/User/Login.vue";
 import Recent from "./components/MainHome/Recent.vue";
-import Project from "./components/MainHome/Project.vue";
 import TrashPage from "./components/MainHome/TrashPage.vue";
 import Favorite from "./components/MainHome/Favorite.vue";
 import LoginRequired from "./components/MainHome/LoginRequired.vue";
 import Drawing from "./components/MainHome/Drawing.vue";
+import LandingPage from "./components/MainHome/LandingPage.vue";
 
 const routes = [
   {
     path: "/",
+    component: LandingPage,
+  },
+  {
+    path: "/MainHome",
     component: MainHome,
   },
   {
@@ -45,10 +49,6 @@ const routes = [
   {
     path: "/Recent",
     component: Recent,
-  },
-  {
-    path: "/Project",
-    component: Project,
   },
   {
     path: "/TrashPage",
