@@ -1,8 +1,13 @@
 <template>
     <div class="landing-container">
         <!-- 중앙 배경 이미지 (텍스트보다 z-index 낮게) -->
-        <img src="/AI.png" alt="AI 배경" class="bg-image" />
-        
+        <img
+            v-if="features[currentIndex].img"
+            :src="features[currentIndex].img"
+            alt="Feature 배경"
+            :class="['bg-image', features[currentIndex].imgClass]"
+        />
+
         <!-- 중앙 텍스트 영역 (이미지 위에 보임) -->
         <div class="center-text">
             {{ features[currentIndex].centerText }}
@@ -48,7 +53,9 @@ const features = [
         프로젝트 주제를 명확히 설정함으로써,
         도메인 특화 데이터셋과
         맞춤형 AI 추론 환경을 자동으로 구성합니다.
-        이를 통해 회의 분석의 정확도와 효율성을 극대화합니다.`
+        이를 통해 회의 분석의 정확도와 효율성을 극대화합니다.`,
+        img: "/Data.png", // 이미지 없음
+        imgClass: "bg-image-Data"
     },
     { 
         text: '실시간 회의 발화 분석',
@@ -57,7 +64,9 @@ const features = [
         참가자 발언을 실시간으로 텍스트로 변환합니다.
         발화 흐름 및 아이디어 생성 과정을
         즉각적으로 구조화함으로써,
-        협업 과정의 투명성과 생산성을 동시에 확보합니다.`
+        협업 과정의 투명성과 생산성을 동시에 확보합니다.`,
+        img: "/Speech.png",
+        imgClass: "bg-image-Speech"
     },
     { 
         text: '마인드맵 자동 시각화',
@@ -65,7 +74,9 @@ const features = [
         SBERT 임베딩 기반 연관성 분석을 통해 
         실시간으로 마인드맵 노드로 변환·시각화합니다. 
         이를 통해 발언의 흐름, 의사결정 근거, 아이디어 간의
-        관계가 직관적으로 탐색 가능합니다.`
+        관계가 직관적으로 탐색 가능합니다.`,
+        img: "/MindMap.png",
+        imgClass: "bg-image-MindMap"
     },
     { 
         text: '인공지능 기반 키워드 추천',
@@ -73,7 +84,9 @@ const features = [
         회의 맥락 및 도메인 특화 데이터를 반영한 키워드와
         아이디어를 실시간 추천합니다. 
         주제에 따라 관련 외부 정보가 웹 크롤링·임베딩 되어, 
-        지속가능하고 확장적인 데이터셋 기반의 추천이 가능합니다.`
+        지속가능하고 확장적인 데이터셋 기반의 추천이 가능합니다.`,
+        img: "/AI.png", // 이 항목에만 이미지 경로 지정
+        imgClass: "bg-image-AI"
     }
 ];
 
@@ -164,7 +177,49 @@ onUnmounted(() => {
 }
 
 /* 중앙 배경 이미지 스타일 (텍스트보다 z-index 낮게) */
-.bg-image {
+.bg-image-Data {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 60vw;
+    min-height: 60vh;
+    max-width: 80vw;
+    max-height: 80vh;
+    object-fit: contain;
+    opacity: 0.6; /* 필요에 따라 조절 (0~1) */
+    pointer-events: none; /* 마우스 클릭 방지 */
+}
+
+.bg-image-Speech {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 60vw;
+    min-height: 60vh;
+    max-width: 65vw;
+    max-height: 80vh;
+    object-fit: contain;
+    opacity: 0.6; /* 필요에 따라 조절 (0~1) */
+    pointer-events: none; /* 마우스 클릭 방지 */
+}
+
+.bg-image-MindMap {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 55vw;
+    min-height: 55vh;
+    max-width: 55vw;
+    max-height: 55vh;
+    object-fit: contain;
+    opacity: 0.7; /* 필요에 따라 조절 (0~1) */
+    pointer-events: none; /* 마우스 클릭 방지 */
+}
+
+.bg-image-AI {
     position: absolute;
     top: 40%;
     left: 50%;
