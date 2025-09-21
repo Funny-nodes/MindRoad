@@ -5,13 +5,18 @@
             v-if="features[currentIndex].img"
             :src="features[currentIndex].img"
             alt="Feature 배경"
-            :class="['bg-image', features[currentIndex].imgClass]"
+            :class="['bg-image', features[currentIndex].imgClass, { 'fade-in': imageReady }]"
+            :key="'img-' + currentIndex"
         />
 
         <!-- 중앙 텍스트 영역 (이미지 위에 보임) -->
-        <div class="center-text">
+        <div
+            :class="['center-text', { 'fade-in': textReady }]"
+            :key="'text-' + currentIndex"
+        >
             {{ features[currentIndex].centerText }}
         </div>
+        
         <div class="features">
             <div
                 v-for="(feature, idx) in features"
@@ -33,15 +38,16 @@
                 </div>
             </div>
         </div>
+        
         <!-- 하단 스크롤 안내 텍스트 및 애니메이션 화살표 추가 -->
-        <div class="scroll-guide">
+        <div class="scroll-guide" @click="navigateToNextPage">
             <i class="fa-solid fa-arrow-down arrow"></i>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -54,7 +60,7 @@ const features = [
         도메인 특화 데이터셋과
         맞춤형 AI 추론 환경을 자동으로 구성합니다.
         이를 통해 회의 분석의 정확도와 효율성을 극대화합니다.`,
-        img: "/Data.png", // 이미지 없음
+        img: "/Data.png",
         imgClass: "bg-image-Data"
     },
     { 
@@ -85,17 +91,37 @@ const features = [
         아이디어를 실시간 추천합니다. 
         주제에 따라 관련 외부 정보가 웹 크롤링·임베딩 되어, 
         지속가능하고 확장적인 데이터셋 기반의 추천이 가능합니다.`,
-        img: "/AI.png", // 이 항목에만 이미지 경로 지정
+        img: "/AI.png",
         imgClass: "bg-image-AI"
     }
 ];
 
 const currentIndex = ref(0);
 const progresses = ref(Array(features.length).fill(0));
+const imageReady = ref(true);
+const textReady = ref(true);
+
 const interval = 30;
-const duration = 2000;
+const duration = 4000;
 
 let timer = null;
+
+// 페이드인 애니메이션 트리거
+function triggerFadeIn() {
+    imageReady.value = false;
+    textReady.value = false;
+    
+    // 약간의 지연 후 동시에 페이드인 시작
+    setTimeout(() => {
+        imageReady.value = true;
+        textReady.value = true;
+    }, 50);
+}
+
+// currentIndex 변경 감지
+watch(currentIndex, () => {
+    triggerFadeIn();
+});
 
 function startProgress() {
     clearInterval(timer);
@@ -110,7 +136,7 @@ function startProgress() {
                     currentIndex.value++;
                     startProgress();
                 }
-            }, 1500); // 1.5초 멈춤
+            }, 2000); // 2초 멈춤
         }
     }, interval);
 }
@@ -120,6 +146,19 @@ function goTo(idx) {
     currentIndex.value = idx;
     progresses.value = Array(features.length).fill(0);
     startProgress();
+}
+
+// === 페이지 이동 함수 ===
+function navigateToNextPage() {
+    const isLoggedIn = (
+        sessionStorage.getItem("isLoggedIn") === "true" &&
+        sessionStorage.getItem("userEmail") !== null
+    );
+    if (isLoggedIn) {
+        router.push("/MyMap");
+    } else {
+        router.push("/MainHome");
+    }
 }
 
 // === 아래로 스크롤 시 페이지 이동 ===
@@ -134,15 +173,7 @@ function handleWheel(event) {
         isScrolling = true;
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
-            const isLoggedIn = (
-                sessionStorage.getItem("isLoggedIn") === "true" &&
-                sessionStorage.getItem("userEmail") !== null
-            );
-            if (isLoggedIn) {
-                router.push("/MyMap");
-            } else {
-                router.push("/MainHome");
-            }
+            navigateToNextPage();
             setTimeout(() => {
                 isScrolling = false;
             }, 500);
@@ -151,6 +182,7 @@ function handleWheel(event) {
 }
 
 onMounted(() => {
+    triggerFadeIn();
     startProgress();
     window.addEventListener("wheel", handleWheel, { passive: false });
 });
@@ -177,22 +209,29 @@ onUnmounted(() => {
 }
 
 /* 중앙 배경 이미지 스타일 (텍스트보다 z-index 낮게) */
-.bg-image-Data {
+.bg-image {
     position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.bg-image.fade-in {
+    opacity: 0.6;
+}
+
+.bg-image-Data {
     top: 28%;
-    left: 50%;
+    left: 48.5%;
     transform: translate(-50%, -50%);
     min-width: 60vw;
     min-height: 60vh;
     max-width: 80vw;
     max-height: 80vh;
     object-fit: contain;
-    opacity: 0.6; /* 필요에 따라 조절 (0~1) */
-    pointer-events: none; /* 마우스 클릭 방지 */
 }
 
 .bg-image-Speech {
-    position: absolute;
     top: 28%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -201,12 +240,9 @@ onUnmounted(() => {
     max-width: 65vw;
     max-height: 80vh;
     object-fit: contain;
-    opacity: 0.6; /* 필요에 따라 조절 (0~1) */
-    pointer-events: none; /* 마우스 클릭 방지 */
 }
 
 .bg-image-MindMap {
-    position: absolute;
     top: 38%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -215,12 +251,13 @@ onUnmounted(() => {
     max-width: 55vw;
     max-height: 55vh;
     object-fit: contain;
-    opacity: 0.7; /* 필요에 따라 조절 (0~1) */
-    pointer-events: none; /* 마우스 클릭 방지 */
+}
+
+.bg-image-MindMap.fade-in {
+    opacity: 0.7;
 }
 
 .bg-image-AI {
-    position: absolute;
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -229,8 +266,6 @@ onUnmounted(() => {
     max-width: 80vw;
     max-height: 80vh;
     object-fit: contain;
-    opacity: 0.6; /* 필요에 따라 조절 (0~1) */
-    pointer-events: none; /* 마우스 클릭 방지 */
 }
 
 .center-text {
@@ -242,7 +277,7 @@ onUnmounted(() => {
     font-weight: 500;
     color: #fff;
     letter-spacing: 0.05em;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.45); /* 가독성 향상 */
+    text-shadow: 0 2px 8px rgba(0,0,0,0.45);
     pointer-events: none;
     user-select: none;
     text-align: center;
@@ -250,6 +285,12 @@ onUnmounted(() => {
     width: 60vw;
     line-height: 1.5;
     padding: 0 1vw;
+    opacity: 0;
+    transition: opacity 1.3s ease-in-out;
+}
+
+.center-text.fade-in {
+    opacity: 1;
 }
 
 .features {
@@ -313,6 +354,12 @@ onUnmounted(() => {
     font-family: 'Inter', 'Pretendard', 'sans-serif';
     animation: pulse 2s infinite;
     padding-bottom: 8px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.scroll-guide:hover {
+    opacity: 1;
 }
 
 .scroll-guide .arrow {
