@@ -66,7 +66,7 @@ module.exports = (io) => {
         // 모든 참여자가 파일을 업로드할 때까지 대기
         await new Promise((resolve) => {
           if (roomSize === expectedUsers) {
-            resolve(); // 모든 파일이 업로드되었으면 바로 처리 시작
+            resolve(); 
           } else {
             console.log(
               `⏳ ${roomSize}/${expectedUsers}개 파일 업로드됨. 대기 중...`
