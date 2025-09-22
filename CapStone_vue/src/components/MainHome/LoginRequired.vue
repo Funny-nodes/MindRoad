@@ -32,8 +32,41 @@
 </template>
 
 <script>
+import { onMounted, onBeforeUnmount } from "vue";
+import { useRouter } from "vue-router";
+
 export default {
   name: "LoginRequired",
+  setup() {
+    const router = useRouter();
+
+    let isScrolling = false;
+    let scrollTimeout;
+
+    const handleWheel = (event) => {
+      if (isScrolling) return;
+      // 위로 스크롤 시 /로 이동
+      if (event.deltaY < -50) {
+        isScrolling = true;
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          router.push("/");
+          setTimeout(() => {
+            isScrolling = false;
+          }, 500);
+        }, 300);
+      }
+    };
+
+    onMounted(() => {
+      window.addEventListener("wheel", handleWheel, { passive: false });
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener("wheel", handleWheel);
+      clearTimeout(scrollTimeout);
+    });
+  },
 };
 </script>
 
@@ -43,16 +76,18 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative; /* absolute에서 relative로 변경 */
-  margin: 15% auto; /* top/left/transform 대신 margin으로 조정 */
-  padding: 60px 20px;
-  text-align: center;
+  position: relative;
   width: 100%;
   max-width: 500px;
+  margin: 0 auto;             /* 가운데 정렬 */
+  padding: 0 20px;            /* 좌우 여백만, 위아래 padding 제거 */
+  box-sizing: border-box;
+  text-align: center;
+  overflow: hidden;           /* 혹시 넘치는 경우 숨김 */
 }
 
 .empty-recent-icon {
-  margin-bottom: 20px;
+  margin-top: 240px;
   background-color: #f5f5f5;
   width: 160px;
   height: 160px;
@@ -63,14 +98,14 @@ export default {
 }
 
 .empty-recent-title {
-  margin-bottom: 5px;
+  margin-top: 15px;
 }
 
 .empty-recent-description {
   font-size: 14px;
   color: #5f6368;
   max-width: 400px;
-  margin-bottom: 24px;
+  margin-top: 5px;
   line-height: 1.5;
 }
 </style>

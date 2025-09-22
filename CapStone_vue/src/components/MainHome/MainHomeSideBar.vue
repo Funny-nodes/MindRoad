@@ -160,11 +160,11 @@ export default {
     });
 
     const isMainRouteAndNotLoggedIn = computed(() => {
-      return route.path === "/" && !isLoggedIn.value;
+      return route.path === "/MainHome" && !isLoggedIn.value;
     });
 
     const shouldShowLoginRequired = computed(() => {
-      return route.path === "/" && !isLoggedIn.value;
+      return route.path === "/MainHome" && !isLoggedIn.value;
     });
 
     const handleNavClick = (navFunction) => {
@@ -201,7 +201,7 @@ export default {
       sessionStorage.removeItem("userEmail");
       sessionStorage.removeItem("userNickname");
       sessionStorage.removeItem("isLoggedIn");
-      router.push("/");
+      router.push("/MainHome");
     };
 
     return {
