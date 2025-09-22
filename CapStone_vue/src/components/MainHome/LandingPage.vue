@@ -55,11 +55,11 @@ const router = useRouter();
 const features = [
     { 
         text: '프로젝트 주제 선택',
-        centerText: `MindRoad 시스템은 회의 시작 단계에서
-        프로젝트 주제를 명확히 설정함으로써,
+        centerText: `MindRoad 시스템은 초기 시작 단계에서
+        프로젝트 주제를 명확히 설정함으로써
         도메인 특화 데이터셋과
-        맞춤형 AI 추론 환경을 자동으로 구성합니다.
-        이를 통해 회의 분석의 정확도와 효율성을 극대화합니다.`,
+        맞춤형 AI 추론 환경을 자동으로 구성합니다
+        이를 통해 회의 분석의 정확도와 효율성을 극대화합니다`,
         img: "/Data.png",
         imgClass: "bg-image-Data"
     },
@@ -67,30 +67,30 @@ const features = [
         text: '실시간 회의 발화 분석',
         centerText: `본 연구는 Whisper 기반 STT와
         faster-whisper 최적화 모델을 활용하여
-        참가자 발언을 실시간으로 텍스트로 변환합니다.
+        참가자 발언을 실시간으로 텍스트로 변환합니다
         발화 흐름 및 아이디어 생성 과정을
-        즉각적으로 구조화함으로써,
-        협업 과정의 투명성과 생산성을 동시에 확보합니다.`,
+        즉각적으로 구조화함으로써
+        협업 과정의 투명성과 생산성을 동시에 확보합니다`,
         img: "/Speech.png",
         imgClass: "bg-image-Speech"
     },
     { 
         text: '마인드맵 자동 시각화',
-        centerText: `회의 발화에서 추출된 키워드와 요약 정보를
+        centerText: `회의 발화에서 주제와 관련된 키워드를 추출하고
         SBERT 임베딩 기반 연관성 분석을 통해 
-        실시간으로 마인드맵 노드로 변환·시각화합니다. 
-        이를 통해 발언의 흐름, 의사결정 근거, 아이디어 간의
-        관계가 직관적으로 탐색 가능합니다.`,
+        실시간으로 마인드맵 노드로 자동 변환·시각화합니다 
+        이를 통해 발언의 흐름 · 의사결정 근거 · 아이디어 간의
+        관계가 직관적으로 탐색 가능합니다`,
         img: "/MindMap.png",
         imgClass: "bg-image-MindMap"
     },
     { 
         text: '인공지능 기반 키워드 추천',
-        centerText: `로컬 LLM에 LoRA·RAG 기법을 결합하여, 
+        centerText: `로컬 LLM에 LoRA·RAG 기법을 결합하여 
         회의 맥락 및 도메인 특화 데이터를 반영한 키워드와
-        아이디어를 실시간 추천합니다. 
-        주제에 따라 관련 외부 정보가 웹 크롤링·임베딩 되어, 
-        지속가능하고 확장적인 데이터셋 기반의 추천이 가능합니다.`,
+        아이디어를 실시간 추천합니다 
+        주제에 따라 관련 외부 정보가 웹 크롤링·임베딩 되어 
+        지속가능하고 확장적인 데이터셋 기반의 추천이 가능합니다`,
         img: "/AI.png",
         imgClass: "bg-image-AI"
     }
@@ -102,7 +102,7 @@ const imageReady = ref(true);
 const textReady = ref(true);
 
 const interval = 30;
-const duration = 4000;
+const duration = 6000;
 
 let timer = null;
 
@@ -287,6 +287,7 @@ onUnmounted(() => {
     padding: 0 1vw;
     opacity: 0;
     transition: opacity 1.3s ease-in-out;
+    font-family: 'Orbitron', 'Eurostile', 'Bank Gothic', 'sans-serif';
 }
 
 .center-text.fade-in {
