@@ -72,21 +72,21 @@ export default function meetingContent(content) {
       report += "<p style='color: #bbb;'>회의록 데이터 없음</p>";
     }
 
-    // ** 키워드 출력 **
-    if (minutes && Array.isArray(minutes.keywords)) {
-      report += `
-        <h3>🔑 주요 키워드</h3>
-        <br>
-        <ul>
-          ${minutes.keywords
-            .map((keyword) => `<li style="margin-left: 20px;">${keyword}</li>`)
-            .join("")}
-        </ul><br>
+    // // ** 키워드 출력 **
+    // if (minutes && Array.isArray(minutes.keywords)) {
+    //   report += `
+    //     <h3>🔑 주요 키워드</h3>
+    //     <br>
+    //     <ul>
+    //       ${minutes.keywords
+    //         .map((keyword) => `<li style="margin-left: 20px;">${keyword}</li>`)
+    //         .join("")}
+    //     </ul><br>
 
-      `;
-    } else {
-      report += "<p style='color: #bbb;'>키워드 데이터 없음</p>";
-    }
+    //   `;
+    // } else {
+    //   report += "<p style='color: #bbb;'>키워드 데이터 없음</p>";
+    // }
   } catch (error) {
     console.error("Error parsing response:", error);
     report += "<p style='color: #bbb;'>파싱 중 오류 발생</p>";
