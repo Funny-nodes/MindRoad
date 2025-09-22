@@ -117,7 +117,7 @@ exports.processIndividualFile = async (
     if (isRealTime) {
       // ✅ 실시간: 코랩 서버(/mindmap/suggest)로 키워드만 추출
       const { raw, keywords } = await extractRealtimeKeywordsFromColab({
-        srtJson: formattedSpeech, // [{time,speaker,speech}, ...]
+        srtJson: mergedSTT, // [{time,speaker,speech}, ...]
         nodeData, // DB 노드 스냅샷
         baseURL: process.env.MINDROAD_BASE_URL || "https://mind-road2.loca.lt",
         category,
