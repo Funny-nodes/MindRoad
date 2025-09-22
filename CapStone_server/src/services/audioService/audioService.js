@@ -4,9 +4,9 @@ const fs = require("fs");
 const { mixAudio } = require("./audioMix");
 const { convertToWhisperWav } = require("./convertToWhisperWav");
 const {
-  makeSafeNickname,
   convertSegmentsToSRTJson,
-} = require("./safeNickname");
+  replaceSpeaker
+} = require("./safeNickName");
 const { askOpenAI } = require("./callOpenAI"); // 회의록 요약
 const { deleteFiles } = require("./deleteFiles");
 const nodeService = require("../nodeService/nodeService");
@@ -14,6 +14,7 @@ const { callSTT } = require("./callSTT");
 const {
   extractRealtimeKeywordsFromColab,
 } = require("./realtimeKeywordsFromColab"); // ✅ 실시간 키워드 추출
+const { type } = require("os");
 
 const audioFolder = path.join(__dirname, "../../../storage/audio");
 const tempAudioFolder = path.join(__dirname, "../../../storage/temp_audio");
@@ -23,11 +24,21 @@ exports.processIndividualFile = async (
   roomId,
   isRealTime
 ) => {
-  const userSpeech = {}; // { nickname: [{time,speaker,speech}, ...] }
-  const speakerNames = []; // ["닉1","닉2",...]
-
+  const userSpeech = {}; 
+  const speakerNames = []; 
   try {
     if (!roomAudioBuffers || roomAudioBuffers.length === 0) return;
+
+    const audioType = isRealTime ? "realTime" : "meeting";
+    const userTempFolder = path.join(tempAudioFolder, audioType, roomId);
+    const userAudioFolder = path.join(audioFolder, audioType, roomId);
+
+    console.log("🧪 userAudioFolder:", userAudioFolder);
+    console.log("🧪 userTempFolder:", userTempFolder);
+
+    if (!fs.existsSync(userAudioFolder)) {
+      fs.mkdirSync(userAudioFolder, { recursive: true });
+    }
 
     const outputWavPaths = await Promise.all(
       roomAudioBuffers.map(async (userObject) => {
@@ -43,13 +54,37 @@ exports.processIndividualFile = async (
       })
     );
 
+    const mixedAudioPath = await mixAudio(userAudioFolder, userAudioFolder);
+
     const sttResults = await callSTT(outputWavPaths.map((o) => o.wavPath));
+    if (!sttResults || !sttResults.results || !Array.isArray(sttResults.results)) {
+      console.error("❌ STT 결과가 올바르지 않습니다:", sttResults);
+      throw new Error("STT 서비스 응답이 유효하지 않습니다");
+    }
+
+    console.log(`STT: ${JSON.stringify(sttResults.results)}`);
 
     // STT 결과 적재
     for (const stt of sttResults.results) {
       const nickname = stt.nickname;
-      userSpeech[nickname] = stt.segments;
+      userSpeech[nickname] = stt.segments.map((seg) => typeof seg === "string" ? seg : seg.text);
       speakerNames.push(nickname);
+    }
+
+    const mixedsttResult = await callSTT(mixedAudioPath)
+    if (!mixedsttResult) {
+      console.error("❌ 혼합 오디오 STT 결과가 없습니다");
+      throw new Error("혼합 오디오 STT 처리 실패");
+    }
+
+    console.log(`Miexed STT: ${JSON.stringify(mixedsttResult)}`);
+
+    const mergedSpeech = [];
+    for (const stt of mixedsttResult.results) {
+      const nickname = stt.nickname;
+      mergedSpeech[nickname] = stt.segments.map((seg) =>
+        typeof seg === "string" ? seg : seg.text
+      );
     }
 
     // 프로젝트/노드 로드
@@ -62,11 +97,19 @@ exports.processIndividualFile = async (
     console.log(`🎯 Project ${projectId} category=${category}`);
 
     // 하나의 타임라인 SRT JSON으로 병합
-    const formattedSpeech = convertSegmentsToSRTJson(userSpeech);
+    const formattedSpeech = await convertSegmentsToSRTJson(userSpeech);
+    const formattedMixedSpeech = await convertSegmentsToSRTJson(mergedSpeech);
     console.log(
       "📌 변환된 SRT JSON:",
-      JSON.stringify(formattedSpeech, null, 2)
+      JSON.stringify(formattedSpeech, null, 2),
+      "📌 변환된 Mixed SRT JSON:",
+      JSON.stringify(formattedMixedSpeech, null, 2)
     );
+
+    const mergedSTT = await replaceSpeaker(formattedMixedSpeech, formattedSpeech)
+
+    console.log("병합된 최종 STT: ", mergedSTT)
+    
 
     let openAIResponse;
     let addedNodes = null;
@@ -91,7 +134,8 @@ exports.processIndividualFile = async (
     } else {
       // ✅ 회의록 요약: 닉네임별 맵 불필요, SRT JSON 배열 그대로 전달
       openAIResponse = await askOpenAI(
-        formattedSpeech, // ← 배열 그대로
+        // formattedSpeech,
+        mergedSTT,
         speakerNames,
         nodeData,
         false
@@ -102,23 +146,6 @@ exports.processIndividualFile = async (
         openAIResponse.rootNode = nodeData[0];
       }
     }
-
-    
-
-    const audioType = isRealTime ? "realTime" : "meeting";
-    const userTempFolder = path.join(tempAudioFolder, audioType, roomId);
-    const userAudioFolder = path.join(audioFolder, audioType, roomId);
-
-    console.log("🧪 userAudioFolder:", userAudioFolder);
-    console.log("🧪 userTempFolder:", userTempFolder);
-
-    if (!fs.existsSync(userAudioFolder)) {
-      fs.mkdirSync(userAudioFolder, { recursive: true });
-    }
-
-    const mixedAudioPath = await mixAudio(userAudioFolder, userAudioFolder);
-
-    
 
     // 파일 삭제
     deleteFiles(userTempFolder);
@@ -131,7 +158,7 @@ exports.processIndividualFile = async (
   }
 };
 
-exports.mixAndConvertAudio = async (roomId, roomAudioBuffers) => {
+exports.mixAndConvertAudio = async ( roomAudioBuffers) => {
   try {
     if (roomAudioBuffers.length === 1) {
       return roomAudioBuffers[0];

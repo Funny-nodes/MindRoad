@@ -8,7 +8,7 @@ async function mixAudio(folderPath, outputPath) {
     fs.readdir(folderPath, async (err, files) => {
       if (err) return reject(err);
 
-      // .mp3 파일 필터링 후 알파벳순 정렬
+      
       const inputPaths = files
         .filter((file) => path.extname(file).toLowerCase() === ".wav")
         .map((file) => path.join(folderPath, file))
@@ -29,10 +29,10 @@ async function mixAudio(folderPath, outputPath) {
       }
 
       // 파일 이름 가져오기
-      const fileNames = inputPaths.map((file) => path.basename(file, ".mp3"));
+      const fileNames = inputPaths.map((file) => path.basename(file, ".wav"));
 
       // 믹싱된 파일 이름 생성 (예: "기업+선준+희찬.mp3")
-      const outputFileName = `${fileNames.join("+")}.mp3`;
+      const outputFileName = `${fileNames.join("+")}.wav`;
       const outputFilePath = path.join(outputPath, outputFileName);
 
       console.log(`🔹 Mixing files: ${inputPaths.join(", ")}`);
@@ -54,9 +54,8 @@ async function mixAudio(folderPath, outputPath) {
               },
             },
           ])
-          .audioCodec("libmp3lame") // MP3 변환을 위한 적절한 코덱 설정
-          .audioBitrate("192k") // MP3 품질 설정 (128k ~ 320k 가능)
-          .format("mp3") // MP3 포맷으로 저장
+          .audioCodec("pcm_s16le") 
+          .format("wav") // MP3 포맷으로 저장
           .on("end", () => {
             console.log(`✅ Mixing finished. Output file: ${outputFilePath}`);
             resolve(outputFilePath);

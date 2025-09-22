@@ -3,14 +3,16 @@ const path = require("path")
 const axios = require("axios")
 
 exports.callSTT = async(outputWavPath) =>{
-  if (!Array.isArray(outputWavPath) || outputWavPath.length === 0) {
+  if (!outputWavPath) {
     throw new Error("❌ wav 파일이 존재하지 않습니다: " + outputWavPath);
   }
 
+
+  const paths = Array.isArray(outputWavPath)? outputWavPath : [outputWavPath];
   const FormData = require("form-Data")
   const formData = new FormData();
 
-  for (const wavPath of outputWavPath) {
+  for (const wavPath of paths) {
     if (!fs.existsSync(wavPath)) {
       throw new Error("❌ wav 파일이 존재하지 않습니다: " + wavPath);
     }
