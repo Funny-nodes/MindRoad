@@ -1,10 +1,10 @@
 // utils/colorUtils.js
 import * as go from "gojs";
 
-const BRANCH_COLORS = ["#7ED0D6", "#2442A5", "#2CAAE1", "#322B80"];
+const BRANCH_COLORS = ["#7ED0D6", "#5B7FE5", "#2CAAE1", "#6B5FBD"];
 
 // hex 색상을 어둡게 만드는 함수
-export function darkenColor(hex, percent = 20) {
+export function darkenColor(hex, percent = 100) {
   if (!hex) return "#000000";
   let num = parseInt(hex.slice(1), 16);
   let r = (num >> 16) & 0xff;

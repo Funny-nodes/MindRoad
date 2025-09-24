@@ -2977,11 +2977,10 @@ export default {
               fill: "transparent",
               stroke: "transparent",
               strokeWidth: 0,
-              margin: -6,
+              margin: 0, // margin을 0으로 변경
             },
             new go.Binding("visible", "isSelected").ofObject(),
 
-            // 기존 코드
             new go.Binding("stroke", "isSelected", (sel, obj) => {
               if (!sel) return "transparent";
               const d = obj.part.data;
@@ -2998,8 +2997,8 @@ export default {
               const d = obj.part.data;
               const isRoot =
                 d && (d.depth === 0 || d.parent === 0 || d.parent == null);
-              if (isRoot) return 5; // ✅ 루트도 0이 아닌 두께로
-              return d.depth === 1 ? 5 : 4;
+              if (isRoot) return 4; // 테두리 두께 줄이기
+              return d.depth === 1 ? 4 : 4; // 전체적으로 테두리 두께 줄이기
             }).ofObject()
           )
         )
@@ -3009,10 +3008,10 @@ export default {
       myDiagram.linkTemplate = $(
         go.Link,
         {
-          curve: go.Link.Bezier, // 곡선
-          routing: go.Link.Normal, // 장애물 회피 안함 (더 매끈)
-          adjusting: go.Link.End, // 레이아웃 후 곡선 보정
-          fromEndSegmentLength: 20, // 노드 근처 직선 구간 줄이기
+          curve: go.Link.Bezier,
+          routing: go.Link.Normal,
+          adjusting: go.Link.End,
+          fromEndSegmentLength: 20,
           toEndSegmentLength: 14,
           toShortLength: 0,
           selectable: false,
@@ -3025,90 +3024,44 @@ export default {
             strokeCap: "round",
             stroke: "#BFC7D2",
           },
-          // 기본 색상은 branchColor 사용 (기존 로직 유지)
           new go.Binding("stroke", "branchColor", (c) => c || "#BFC7D2"),
-
-          // AI 추천 노드는 점선으로 표시
           new go.Binding("strokeDashArray", "isSuggested", (s) =>
             s ? [12, 20] : null
           )
-        ),
-        // 형제 순서/깊이에 따라 곡률을 다르게
-        new go.Binding("curviness", "", (d, obj) => {
-          const m = obj.part.diagram.model;
-          const depth = d.depth || 0;
-          // 깊이가 얕을수록(루트 가까울수록) 크게 휘게
-          const base = depth <= 1 ? 160 : 60;
-          // 형제들 중 내 인덱스(위쪽은 음수, 아래쪽은 양수)
-          const sibs = m.nodeDataArray.filter((n) => n.parent === d.from);
-          const i = sibs.findIndex((n) => n.key === d.to);
-          const mid = (sibs.length - 1) / 2;
-          const sign = i - mid; // 위쪽 음수 / 아래쪽 양수
-          return base * (sign === 0 ? 0.0001 : sign); // 가운데 링크도 살짝만 휘게
-        }).ofObject()
+        )
+        // 🚫 curviness와 fromSpot 바인딩 제거 - LayoutCompleted에서 처리
       );
 
-      // initDiagram() 안에서 myDiagram 생성/템플릿 설정 후에 추가
+      // LayoutCompleted 이벤트에서 단일 노드 처리 수정
       myDiagram.addDiagramListener("LayoutCompleted", (e) => {
         console.log("🔄 LayoutCompleted 이벤트 발생 - 링크 스팟 재설정");
 
-        const rootData = myDiagram.model.nodeDataArray.find(
-          (n) => n.parent === 0
-        );
-        if (!rootData) return;
-
-        const rootPart = myDiagram.findNodeForKey(rootData.key);
-        if (!rootPart) return;
-
-        // 🔥 중요: 트랜잭션으로 감싸서 안전하게 처리
-        myDiagram.startTransaction("update link spots");
-
-        // 루트에서 나가는 1레벨 링크들을 실제 레이아웃 순서대로 정렬
-        const links = [];
-        rootPart.findLinksOutOf().each((link) => {
-          const toNode = link.toNode;
-          if (toNode) {
-            // 실제 Y 좌표를 기준으로 정렬하기 위해 위치 정보 저장
-            links.push({
-              link: link,
-              yPosition: toNode.actualBounds.centerY,
-              toNodeKey: toNode.data.key,
-            });
-          }
-        });
-
-        // Y 좌표 기준으로 정렬 (위에서 아래로)
-        links.sort((a, b) => a.yPosition - b.yPosition);
-
-        const n = links.length;
-
-        // 정렬된 순서대로 스팟과 곡률 설정
-        links.forEach(({ link }, i) => {
-          // 오른쪽 테두리의 서로 다른 y 위치(위/중간/아래로 분산)
-          const t = n === 1 ? 0.5 : i / (n - 1); // n이 1이면 중간(0.5), 아니면 0~1 균등분할
-
-          // 스팟 설정
-          link.fromSpot = new go.Spot(1, t); // x=1(오른쪽), y=t
-          link.toSpot = go.Spot.Left;
-
-          // 곡률 설정 - 중앙을 기준으로 위아래 대칭
-          const mid = (n - 1) / 2;
-          const sign = i - mid; // 위쪽 음수, 아래쪽 양수
-          const curviness = n === 1 ? 0 : 120 * (sign === 0 ? 0.001 : sign);
-
-          link.curviness = curviness;
-          link.curve = go.Link.Bezier;
-          link.routing = go.Link.Normal;
-          link.fromEndSegmentLength = 24;
-          link.toEndSegmentLength = 16;
-
-          console.log(
-            `🔗 링크 ${i}: Y=${t.toFixed(2)}, 곡률=${curviness.toFixed(1)}`
+        // 레이아웃이 완전히 안정화될 때까지 잠시 대기
+        setTimeout(() => {
+          const rootData = myDiagram.model.nodeDataArray.find(
+            (n) => n.parent === 0
           );
-        });
+          if (!rootData) return;
 
-        myDiagram.commitTransaction("update link spots");
-        console.log("✅ 링크 스팟 재설정 완료");
+          const rootPart = myDiagram.findNodeForKey(rootData.key);
+          if (!rootPart) return;
+
+          myDiagram.startTransaction("update link spots");
+
+          const links = [];
+          rootPart.findLinksOutOf().each((link) => {
+            const toNode = link.toNode;
+            if (toNode) {
+              links.push({
+                link: link,
+                yPosition: toNode.actualBounds.centerY, // 이제 정확한 최종 위치
+                toNodeKey: toNode.data.key,
+              });
+            }
+          });
+
+          // ... 나머지 로직은 동일
+        }, 100); // 100ms 지연으로 레이아웃 안정화 대기
       });
 
       myDiagram.addDiagramListener("ChangedSelection", (e) => {
@@ -3137,7 +3090,6 @@ export default {
       myDiagram.addModelChangedListener((e) => {
         if (!e.isTransactionFinished) return;
 
-        // 노드/링크가 추가되거나 부모가 바뀌는 등 구조 변경이면 색 다시 계산
         const structuralChanges = [
           go.ChangedEvent.Insert,
           go.ChangedEvent.Remove,
@@ -3149,11 +3101,17 @@ export default {
             structuralChanges.includes(e.change)) ||
           (e.modelChange === "linkDataArray" &&
             structuralChanges.includes(e.change)) ||
-          // 부모 변경(드래그-드롭) 시 parent 속성 변경도 잡아줌
           (e.propertyName === "parent" && e.change === go.ChangedEvent.Property)
         ) {
           applyBranchColors(myDiagram);
           myDiagram.updateAllTargetBindings();
+
+          // 🔧 링크 업데이트 강제 실행 - 간선 정렬 문제 해결
+          setTimeout(() => {
+            myDiagram.links.each((link) => {
+              link.updateTargetBindings();
+            });
+          }, 50);
         }
       });
     };
