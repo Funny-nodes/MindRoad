@@ -282,6 +282,7 @@ import axios from "axios";
 import uploadAudio from "../audio/uploadAudio";
 import meetingContent from "../audio/meetingContent";
 import meetingPDF from "../audio/meetingPDF";
+import meetingPDF02 from "../audio/meetingPDF02";
 import { fetchHeaderBlob } from "../audio/fetchHeaderBlob";
 import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
 
@@ -565,16 +566,16 @@ export default {
 
         this.recordedChunks.push(event.data);
 
-        if (blob.size > 0 && this.mediaRecorder.state === "recording") {
-          try {
-            await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
-            console.log("✅ 업로드 성공");
-          } catch (err) {
-            console.error("❌ 업로드 실패:", err.message);
-          }
-        } else {
-          console.warn("🚫 실시간 종료");
-        }
+        // if (blob.size > 0 && this.mediaRecorder.state === "recording") {
+        //   try {
+        //     await uploadAudio(blob, this.roomId, this.userNickname, "realTime");
+        //     console.log("✅ 업로드 성공");
+        //   } catch (err) {
+        //     console.error("❌ 업로드 실패:", err.message);
+        //   }
+        // } else {
+        //   console.warn("🚫 실시간 종료");
+        // }
       };
 
       this.uploadInterval = setInterval(async () => {
@@ -693,7 +694,8 @@ export default {
           const report = meetingContent(recordingData);
 
           // 📄 회의록 PDF 생성
-          const doc = await meetingPDF(recordingData);
+          // const doc = await meetingPDF(recordingData);
+          const doc = await meetingPDF02(recordingData);
           const pdfBlob = await doc.output("blob");
           this.pdfBlob = pdfBlob;
 
