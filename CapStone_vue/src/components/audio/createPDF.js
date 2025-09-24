@@ -54,19 +54,19 @@ export default async function createPDF(data) {
     },
   });
 
-  // 🔑 키워드
-  doc.text("5. 주요 키워드", 10, doc.lastAutoTable.finalY + 10);
-  autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 16,
-    body: minutes.keywords.map((k) => [k]),
-    theme: "striped",
-    styles: { font: "NotoSansKR", halign: "left" },
-  });
+  // // 🔑 키워드
+  // doc.text("5. 주요 키워드", 10, doc.lastAutoTable.finalY + 10);
+  // autoTable(doc, {
+  //   startY: doc.lastAutoTable.finalY + 16,
+  //   body: minutes.keywords.map((k) => [k]),
+  //   theme: "striped",
+  //   styles: { font: "NotoSansKR", halign: "left" },
+  // });
 
   // 📝 SRT 대화
   doc.addPage();
 
-  doc.text("6. 대화내용 (SRT)", 10, 15);
+  doc.text("5. 대화내용 (SRT)", 10, 15);
 
   const srtTable = srt.map((item) => [
     item.time,
