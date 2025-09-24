@@ -132,10 +132,13 @@ function startProgress() {
             progresses.value[currentIndex.value] = 100;
             clearInterval(timer);
             setTimeout(() => {
+                // 여기서 루프 동작 추가!
                 if (currentIndex.value < features.length - 1) {
                     currentIndex.value++;
-                    startProgress();
+                } else {
+                    currentIndex.value = 0; // 처음으로 돌아감
                 }
+                startProgress();
             }, 2000); // 2초 멈춤
         }
     }, interval);
