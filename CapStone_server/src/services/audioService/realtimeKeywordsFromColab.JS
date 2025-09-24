@@ -98,6 +98,12 @@ async function postWithRetry(url, payload) {
             Array.isArray(data.placements) ? data.placements.length : 0
           }`
         );
+
+        // 키워드 정보만 간단히 출력
+        if (Array.isArray(data.keywords) && data.keywords.length > 0) {
+          console.log(`반환된 키워드: ${data.keywords.join(", ")}`);
+        }
+
         return data;
       }
 
