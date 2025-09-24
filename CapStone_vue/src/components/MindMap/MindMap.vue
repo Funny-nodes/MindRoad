@@ -113,7 +113,8 @@
             <i class="fa-solid fa-robot"></i>
           </button>
 
-          <!-- 주제 추천 버튼 추가 -->
+          <!-- 주제 추천 버튼 숨김 처리 -->
+          <!-- 
           <button
             class="fab"
             @click="openTopicSuggestionModal"
@@ -122,6 +123,7 @@
           >
             <i class="fa-solid fa-lightbulb"></i>
           </button>
+          -->
 
           <!-- 팀원 초대 -->
           <button
