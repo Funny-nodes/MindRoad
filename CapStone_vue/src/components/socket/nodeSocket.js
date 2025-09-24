@@ -1,5 +1,6 @@
 import { socket } from "./socket";
 import * as go from "gojs";
+import { applyBranchColors } from "../utils/colorUtils";
 
 /**
  * 특정 노드가 다른 노드의 하위 노드인지 검사하는 함수
@@ -48,6 +49,12 @@ export const registerSocketHandlers = (myDiagram, roomId, userId) => {
       myDiagram.model.addNodeData(newNode);
     });
     myDiagram.commitTransaction("add node");
+
+    // ✅ 색상 적용 추가
+    setTimeout(() => {
+      applyBranchColors(myDiagram);
+      myDiagram.updateAllTargetBindings();
+    }, 100);
 
     // 마인드맵 업데이트 이벤트 발생
     window.dispatchEvent(new CustomEvent("mindmap-updated"));
@@ -191,6 +198,12 @@ export const registerSocketHandlers = (myDiagram, roomId, userId) => {
       console.log(
         `✅ [Vue] 노드 부모 업데이트 완료: ${nodeId} → ${newParentId}`
       );
+
+      // ✅ 노드 이동 후 색상 재적용
+      setTimeout(() => {
+        applyBranchColors(myDiagram);
+        myDiagram.updateAllTargetBindings();
+      }, 100);
 
       // 마인드맵 업데이트 이벤트 발생
       window.dispatchEvent(new CustomEvent("mindmap-updated"));

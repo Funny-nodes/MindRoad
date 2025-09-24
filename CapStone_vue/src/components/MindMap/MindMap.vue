@@ -113,7 +113,8 @@
             <i class="fa-solid fa-robot"></i>
           </button>
 
-          <!-- 주제 추천 버튼 추가 -->
+          <!-- 주제 추천 버튼 숨김 처리 -->
+          <!-- 
           <button
             class="fab"
             @click="openTopicSuggestionModal"
@@ -122,6 +123,7 @@
           >
             <i class="fa-solid fa-lightbulb"></i>
           </button>
+          -->
 
           <!-- 팀원 초대 -->
           <button
@@ -390,6 +392,7 @@ import {
 } from "@/api/projectApi";
 import bestIdeaApi from "@/api/bestIdeaApi"; // 파일 상단에 import 추가
 import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
+import { applyBranchColors, darkenColor } from "../utils/colorUtils";
 
 export default {
   components: {
@@ -417,7 +420,7 @@ export default {
 
     const diagramDiv = ref(null);
     let myDiagram = null;
-    const currentZoom = ref(1);
+    const currentZoom = ref(0.5);
     const selectedNode = ref(null);
     const MIN_ZOOM = 0.2;
     const MAX_ZOOM = 2;
@@ -712,7 +715,7 @@ export default {
       try {
         // 씬(Scene) 생성 및 배경 설정
         threeScene = new THREE.Scene();
-        threeScene.background = new THREE.Color(0xfafafa);
+        threeScene.background = new THREE.Color(0xffffff);
         console.log("🌍 씬 생성 완료");
 
         // 컨테이너 크기 설정
@@ -1522,9 +1525,10 @@ export default {
       const nodePanel = node.findObject("NODE_PANEL");
       const nodePanelWidth = nodePanel.actualBounds.width * diagramScale;
 
-      const minWidth = 80 * diagramScale;
-      const inputWidth = Math.max(minWidth, nodePanelWidth + 30 * diagramScale);
-      const inputHeight = 35 * diagramScale;
+      // 🔧 최소 너비와 입력 필드 너비를 늘림
+      const minWidth = 150 * diagramScale; // 기존: 80 → 150으로 증가
+      const inputWidth = Math.max(minWidth, nodePanelWidth + 30 * diagramScale); // 기존: 30 → 60으로 증가
+      const inputHeight = 50 * diagramScale; // 기존: 35 → 50으로 증가
 
       const diagramPos = myDiagram.position;
       const nodeCenterX =
@@ -1542,7 +1546,7 @@ export default {
       inputField.style.padding = `${8 * diagramScale}px ${12 * diagramScale}px`;
       inputField.style.border = `${2 * diagramScale}px solid #9C6CFE`;
       inputField.style.borderRadius = `${6 * diagramScale}px`;
-      inputField.style.fontSize = `${14 * diagramScale}px`;
+      inputField.style.fontSize = `${20 * diagramScale}px`;
       inputField.style.boxShadow = `0 ${2 * diagramScale}px ${
         6 * diagramScale
       }px rgba(0, 0, 0, 0.15)`;
@@ -2160,17 +2164,24 @@ export default {
         isSelected: false,
         project_id: paramProject_id.value,
         isSuggested: true, // ✅ AI 추천 여부 추가
+        branchColor: selectedNode.value.branchColor, // ✅ 부모 노드의 색상 상속
+        depth: (selectedNode.value.depth || 0) + 1, // ✅ depth 설정
       };
 
       myDiagram.startTransaction("add suggested node");
       myDiagram.model.addNodeData(newNode);
 
-      // ✅ AI 추천 노드의 간선에도 isSuggested 추가
+      // ✅ AI 추천 노드의 간선에도 색상과 AI 추천 속성 추가
       myDiagram.model.addLinkData({
         from: selectedNode.value.key,
         to: newNode.key,
         isSuggested: true, // ✅ 간선 데이터에 AI 추천 여부 추가
+        branchColor: selectedNode.value.branchColor, // ✅ 부모 노드의 색상 상속
       });
+
+      // 즉시 색상 적용
+      applyBranchColors(myDiagram);
+      myDiagram.updateAllTargetBindings();
 
       myDiagram.commitTransaction("add suggested node");
     };
@@ -2219,6 +2230,10 @@ export default {
             await addNodeWithAnimation(newNode);
           }
 
+          // ✅ 모든 추천 노드 추가 후 색상 다시 적용
+          applyBranchColors(myDiagram);
+          myDiagram.updateAllTargetBindings();
+
           window.dispatchEvent(new CustomEvent("mindmap-updated"));
         } else {
           console.error("❌ 추천된 노드를 받아오지 못했습니다.");
@@ -2265,7 +2280,8 @@ export default {
 
       if (success) {
         addedNodes.value = []; // ✅ 저장 성공 시 초기화
-
+        applyBranchColors(myDiagram);
+        myDiagram.updateAllTargetBindings();
         // 마인드맵 업데이트 이벤트 발생
         window.dispatchEvent(new CustomEvent("mindmap-updated"));
       } else {
@@ -2531,8 +2547,8 @@ export default {
         commandHandler: new CustomCommandHandler(),
         layout: $(go.TreeLayout, {
           angle: 0,
-          nodeSpacing: 50,
-          layerSpacing: 50,
+          nodeSpacing: 70, // 형제 간 세로 간격 ↑
+          layerSpacing: 140, // 부모→자식 가로 간격 ↑ (오른쪽으로 멀리)
           arrangement: go.TreeLayout.ArrangementHorizontal,
           alignment: go.TreeLayout.AlignmentCenterChildren,
           compaction: go.TreeLayout.CompactionNone,
@@ -2575,11 +2591,14 @@ export default {
 
       // ✅ WebSocket 이벤트 등록
       registerSocketHandlers(myDiagram, roomId, userId);
-
+      // 소켓으로 모델 동기화 후
+      applyBranchColors(myDiagram);
+      myDiagram.updateAllTargetBindings();
       // ✅ API 호출하여 서버에서 마인드맵 데이터 불러오기
       loadMindmapFromServer(myDiagram, paramProject_id.value)
         .then(() => {
           console.log("📡 서버에서 마인드맵 로딩 완료");
+          applyBranchColors(myDiagram);
           // 로딩 완료 후 업데이트 이벤트 발생
           window.dispatchEvent(new CustomEvent("mindmap-updated"));
         })
@@ -2605,6 +2624,9 @@ export default {
                 parent: node.parent,
                 isSelected: false,
                 project_id: paramProject_id.value,
+                // ✅ 색상 정보와 depth 정보 보존
+                branchColor: node.branchColor,
+                depth: node.depth,
               };
 
               // ✅ AI 추천 노드 삭제 후 새로운 노드 추가
@@ -2624,6 +2646,13 @@ export default {
 
               if (success) {
                 console.log("✅ AI 추천 노드가 저장되었습니다.");
+
+                // ✅ 저장 후 색상 다시 적용 (서버에서 새 노드가 추가될 때까지 기다린 후)
+                setTimeout(() => {
+                  applyBranchColors(myDiagram);
+                  myDiagram.updateAllTargetBindings();
+                  window.dispatchEvent(new CustomEvent("mindmap-updated"));
+                }, 500); // 서버 응답 대기
               } else {
                 alert("서버에 저장하는데 실패했습니다.");
               }
@@ -2686,6 +2715,21 @@ export default {
             e.diagram.model.startTransaction("drop complete");
             e.diagram.model.setDataProperty(node.data, "isDropTarget", false);
             e.diagram.model.commitTransaction("drop complete");
+
+            // ✅ 노드 이동 후 즉시 스타일 업데이트
+            setTimeout(() => {
+              // 브랜치 색상 및 depth 재계산
+              applyBranchColors(myDiagram);
+
+              // 모든 바인딩 강제 업데이트
+              myDiagram.updateAllTargetBindings();
+
+              // 레이아웃 재정렬
+              myDiagram.layoutDiagram(true);
+
+              // 3D 뷰 업데이트
+              window.dispatchEvent(new CustomEvent("mindmap-updated"));
+            }, 100); // 약간의 지연을 두어 DOM 업데이트 완료 후 실행
 
             isNodeDragging.value = false;
             isDragging.value = false;
@@ -2868,72 +2912,95 @@ export default {
 
         $(
           go.Panel,
-          "Auto",
-          {
-            name: "NODE_PANEL",
-            desiredSize: new go.Size(NaN, NaN),
-            minSize: new go.Size(100, 40),
-          },
+          "Spot", // ✅ 바깥을 Spot으로 변경
+          { name: "NODE_PANEL" },
+
+          // ▶ 본문(기존 inner Auto 유지)
+          $(
+            go.Panel,
+            "Auto",
+            { name: "CONTENT", minSize: new go.Size(100, 40) },
+
+            $(
+              go.Shape,
+              "RoundedRectangle",
+              {
+                name: "MAIN",
+                parameter1: 20,
+                portId: "",
+                fromSpot: go.Spot.AllSides,
+                toSpot: go.Spot.LeftSide,
+                fill: "transparent",
+                stroke: "transparent",
+                strokeWidth: 0,
+              },
+              new go.Binding("fill", "depth", (depth, obj) => {
+                if (depth === 0) return "transparent";
+                if (depth === 1) return obj.part.data.branchColor || "#BFC7D2";
+                return "transparent";
+              })
+            ),
+
+            $(
+              go.Panel,
+              "Horizontal",
+              { margin: 8 },
+              $(
+                go.TextBlock,
+                { name: "NAME_TEXTBLOCK", margin: 8 },
+                new go.Binding("text", "name", (t) =>
+                  t ? t.replace(/^\*/, "") : ""
+                ),
+                new go.Binding("stroke", "depth", (d) =>
+                  d === 1 ? "white" : "black"
+                ),
+                new go.Binding("font", "depth", (d) => {
+                  if (d === 0)
+                    return "bold 40px 'Pretendard', 'Apple SD Gothic Neo', sans-serif"; // 루트만 bold
+                  if (d === 1)
+                    return "30px 'Pretendard', 'Apple SD Gothic Neo', sans-serif"; // bold 제거
+                  return "30px 'Pretendard', 'Apple SD Gothic Neo', sans-serif";
+                })
+              )
+            )
+          ),
+
+          // ▶ OUTLINE(오버레이): 본문 박스를 100% 덮음 → 여백 0
           $(
             go.Shape,
             "RoundedRectangle",
             {
-              fill: "white",
-              strokeWidth: 3,
-              stroke: "rgba(0, 0, 255, .15)",
-              portId: "",
-              fromSpot: go.Spot.RightSide,
-              toSpot: go.Spot.LeftSide,
+              name: "OUTLINE",
               parameter1: 20,
+              alignment: go.Spot.Center,
+              stretch: go.GraphObject.Fill,
+              fill: "transparent",
+              stroke: "transparent",
+              strokeWidth: 0,
+              margin: -6,
             },
-            new go.Binding("fill", "parent", (p) =>
-              p === 0 ? "#FFA500" : "white"
-            ),
-            new go.Binding("stroke", "", (data) => {
-              if (data.isDropTarget) return "rgb(0, 70, 180)"; // 진한 파랑
-              return data.isSelected
-                ? "rgb(0, 170, 255)"
-                : "rgba(0, 0, 255, .15)";
-            }).makeTwoWay(),
-            new go.Binding("strokeDashArray", "isSuggested", (isSuggested) =>
-              isSuggested ? [10, 5] : null
-            )
-          ),
-          $(
-            go.Panel,
-            "Horizontal",
-            { margin: 8 },
-            $(
-              go.TextBlock,
-              {
-                font: "14px sans-serif",
-                stroke: "red",
-                visible: false,
-              },
-              new go.Binding("text", "name", (name) =>
-                name && name.startsWith("*") ? "✎" : ""
-              ),
-              new go.Binding(
-                "visible",
-                "name",
-                (name) => name && name.startsWith("*")
-              )
-            ),
-            $(
-              go.TextBlock,
-              {
-                name: "NAME_TEXTBLOCK",
-              },
-              new go.Binding("text", "name", (name) =>
-                name ? name.replace(/^\*/, "") : ""
-              ),
-              new go.Binding("stroke", "parent", (p) =>
-                p === 0 ? "#FFFFFF" : "black"
-              ),
-              new go.Binding("font", "parent", (p) =>
-                p === 0 ? "bold 22px 'Arial'" : "bold 14px 'Arial'"
-              )
-            )
+            new go.Binding("visible", "isSelected").ofObject(),
+
+            // 기존 코드
+            new go.Binding("stroke", "isSelected", (sel, obj) => {
+              if (!sel) return "transparent";
+              const d = obj.part.data;
+              const isRoot =
+                d && (d.depth === 0 || d.parent === 0 || d.parent == null);
+              if (isRoot) return "#3B82F6";
+              if (d.depth === 1)
+                return darkenColor(d.branchColor || "#3B82F6", 25);
+              return darkenColor(d.branchColor || "#3B82F6", 25);
+            }).ofObject(),
+
+            new go.Binding("strokeWidth", "isSelected", (sel, obj) => {
+              if (!sel) return 0;
+              const d = obj.part.data;
+              const isRoot =
+                d && (d.depth === 0 || d.parent === 0 || d.parent == null);
+              if (isRoot) return 5; // ✅ 루트도 0이 아닌 두께로
+              return d.depth === 1 ? 5 : 4;
+            }).ofObject()
           )
         )
       );
@@ -2942,25 +3009,107 @@ export default {
       myDiagram.linkTemplate = $(
         go.Link,
         {
-          routing: go.Link.Orthogonal,
-          corner: 5,
-          adjusting: go.Link.None,
-          fromEndSegmentLength: 1,
-          toEndSegmentLength: 5,
+          curve: go.Link.Bezier, // 곡선
+          routing: go.Link.Normal, // 장애물 회피 안함 (더 매끈)
+          adjusting: go.Link.End, // 레이아웃 후 곡선 보정
+          fromEndSegmentLength: 20, // 노드 근처 직선 구간 줄이기
+          toEndSegmentLength: 14,
+          toShortLength: 0,
+          selectable: false,
         },
         $(
           go.Shape,
           {
-            name: "LINK_SHAPE", // 🔥 이름 추가하여 찾기 쉽게
-            strokeWidth: 2,
-            stroke: "#555",
+            name: "LINK_SHAPE",
+            strokeWidth: 6,
+            strokeCap: "round",
+            stroke: "#BFC7D2",
           },
-          // ✅ 링크 데이터에서 isSuggested 확인 후 점선 적용
+          // 기본 색상은 branchColor 사용 (기존 로직 유지)
+          new go.Binding("stroke", "branchColor", (c) => c || "#BFC7D2"),
+
+          // AI 추천 노드는 점선으로 표시
           new go.Binding("strokeDashArray", "isSuggested", (s) =>
-            s ? [10, 5] : null
+            s ? [12, 20] : null
           )
-        )
+        ),
+        // 형제 순서/깊이에 따라 곡률을 다르게
+        new go.Binding("curviness", "", (d, obj) => {
+          const m = obj.part.diagram.model;
+          const depth = d.depth || 0;
+          // 깊이가 얕을수록(루트 가까울수록) 크게 휘게
+          const base = depth <= 1 ? 160 : 60;
+          // 형제들 중 내 인덱스(위쪽은 음수, 아래쪽은 양수)
+          const sibs = m.nodeDataArray.filter((n) => n.parent === d.from);
+          const i = sibs.findIndex((n) => n.key === d.to);
+          const mid = (sibs.length - 1) / 2;
+          const sign = i - mid; // 위쪽 음수 / 아래쪽 양수
+          return base * (sign === 0 ? 0.0001 : sign); // 가운데 링크도 살짝만 휘게
+        }).ofObject()
       );
+
+      // initDiagram() 안에서 myDiagram 생성/템플릿 설정 후에 추가
+      myDiagram.addDiagramListener("LayoutCompleted", (e) => {
+        console.log("🔄 LayoutCompleted 이벤트 발생 - 링크 스팟 재설정");
+
+        const rootData = myDiagram.model.nodeDataArray.find(
+          (n) => n.parent === 0
+        );
+        if (!rootData) return;
+
+        const rootPart = myDiagram.findNodeForKey(rootData.key);
+        if (!rootPart) return;
+
+        // 🔥 중요: 트랜잭션으로 감싸서 안전하게 처리
+        myDiagram.startTransaction("update link spots");
+
+        // 루트에서 나가는 1레벨 링크들을 실제 레이아웃 순서대로 정렬
+        const links = [];
+        rootPart.findLinksOutOf().each((link) => {
+          const toNode = link.toNode;
+          if (toNode) {
+            // 실제 Y 좌표를 기준으로 정렬하기 위해 위치 정보 저장
+            links.push({
+              link: link,
+              yPosition: toNode.actualBounds.centerY,
+              toNodeKey: toNode.data.key,
+            });
+          }
+        });
+
+        // Y 좌표 기준으로 정렬 (위에서 아래로)
+        links.sort((a, b) => a.yPosition - b.yPosition);
+
+        const n = links.length;
+
+        // 정렬된 순서대로 스팟과 곡률 설정
+        links.forEach(({ link }, i) => {
+          // 오른쪽 테두리의 서로 다른 y 위치(위/중간/아래로 분산)
+          const t = n === 1 ? 0.5 : i / (n - 1); // n이 1이면 중간(0.5), 아니면 0~1 균등분할
+
+          // 스팟 설정
+          link.fromSpot = new go.Spot(1, t); // x=1(오른쪽), y=t
+          link.toSpot = go.Spot.Left;
+
+          // 곡률 설정 - 중앙을 기준으로 위아래 대칭
+          const mid = (n - 1) / 2;
+          const sign = i - mid; // 위쪽 음수, 아래쪽 양수
+          const curviness = n === 1 ? 0 : 120 * (sign === 0 ? 0.001 : sign);
+
+          link.curviness = curviness;
+          link.curve = go.Link.Bezier;
+          link.routing = go.Link.Normal;
+          link.fromEndSegmentLength = 24;
+          link.toEndSegmentLength = 16;
+
+          console.log(
+            `🔗 링크 ${i}: Y=${t.toFixed(2)}, 곡률=${curviness.toFixed(1)}`
+          );
+        });
+
+        myDiagram.commitTransaction("update link spots");
+        console.log("✅ 링크 스팟 재설정 완료");
+      });
 
       myDiagram.addDiagramListener("ChangedSelection", (e) => {
         const node = myDiagram.selection.first();
@@ -2984,6 +3133,28 @@ export default {
         currentZoom.value = myDiagram.scale;
         // zoom이 변경될 때마다 입력 필드 위치 업데이트
         updateInputFieldPosition();
+      });
+      myDiagram.addModelChangedListener((e) => {
+        if (!e.isTransactionFinished) return;
+
+        // 노드/링크가 추가되거나 부모가 바뀌는 등 구조 변경이면 색 다시 계산
+        const structuralChanges = [
+          go.ChangedEvent.Insert,
+          go.ChangedEvent.Remove,
+          go.ChangedEvent.Property,
+        ];
+
+        if (
+          (e.modelChange === "nodeDataArray" &&
+            structuralChanges.includes(e.change)) ||
+          (e.modelChange === "linkDataArray" &&
+            structuralChanges.includes(e.change)) ||
+          // 부모 변경(드래그-드롭) 시 parent 속성 변경도 잡아줌
+          (e.propertyName === "parent" && e.change === go.ChangedEvent.Property)
+        ) {
+          applyBranchColors(myDiagram);
+          myDiagram.updateAllTargetBindings();
+        }
       });
     };
 
@@ -3117,8 +3288,6 @@ export default {
         // 여전히 mindmap 영역 정보는 WebRTC mouseTracking 등에서 필요함
         socket.emit("update-mindmap-bounds", getMindmapBounds());
       });
-
-      // 노드 업데이트 이벤트 감지 시 3D 뷰도 업데이트
       // 노드 업데이트 이벤트 감지 시 3D 뷰도 업데이트
       window.addEventListener("mindmap-updated", () => {
         if (is3DMode.value && threeRoot) {
