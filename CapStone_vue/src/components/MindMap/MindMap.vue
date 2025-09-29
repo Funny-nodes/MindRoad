@@ -2250,22 +2250,21 @@ export default {
 
     const addNode = async (isSibling = false) => {
       if (!selectedNode.value || !myDiagram) return;
-      // ✅ 동일 레벨 추가일 때만 canAddSibling 체크
       if (isSibling && !canAddSibling.value) return;
 
       const parentKey = isSibling
-        ? selectedNode.value.parent // 동일 레벨 추가 시 부모를 유지
-        : selectedNode.value.id; // 하위 레벨 추가 시 부모는 현재 선택된 노드
+        ? selectedNode.value.parent
+        : selectedNode.value.id;
 
       const parentProject_id = selectedNode.value.project_id;
       const newNode = {
         name: "새 노드",
-        parent: parentKey || 0, // 부모 키가 없으면 최상위 노드
+        parent: parentKey || 0,
         isSelected: false,
         project_id: parentProject_id,
       };
 
-      addedNodes.value.push(newNode); // ✅ 새 노드 저장
+      addedNodes.value.push(newNode);
 
       console.log(
         `✅ ${isSibling ? "동일 레벨" : "하위 레벨"} 노드 추가됨:`,
@@ -2279,11 +2278,20 @@ export default {
       );
 
       if (success) {
-        addedNodes.value = []; // ✅ 저장 성공 시 초기화
-        applyBranchColors(myDiagram);
-        myDiagram.updateAllTargetBindings();
-        // 마인드맵 업데이트 이벤트 발생
-        window.dispatchEvent(new CustomEvent("mindmap-updated"));
+        addedNodes.value = [];
+        
+        // ✅ 레이아웃 완료 후 업데이트
+        myDiagram.layoutDiagram(true);
+        
+        requestAnimationFrame(() => {
+          applyBranchColors(myDiagram);
+          myDiagram.updateAllTargetBindings();
+          myDiagram.layoutDiagram(true);
+          
+          requestAnimationFrame(() => {
+            window.dispatchEvent(new CustomEvent("mindmap-updated"));
+          });
+        });
       } else {
         console.warn("⏪ 서버 오류 발생");
       }

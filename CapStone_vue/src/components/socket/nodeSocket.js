@@ -50,6 +50,19 @@ export const registerSocketHandlers = (myDiagram, roomId, userId) => {
     });
     myDiagram.commitTransaction("add node");
 
+    // ✅ addNode 함수와 동일한 로직 적용
+    myDiagram.layoutDiagram(true);
+    
+    requestAnimationFrame(() => {
+      applyBranchColors(myDiagram);
+      myDiagram.updateAllTargetBindings();
+      myDiagram.layoutDiagram(true);
+      
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new CustomEvent("mindmap-updated"));
+      });
+    });
+
     // ✅ 색상 적용 추가
     setTimeout(() => {
       applyBranchColors(myDiagram);
