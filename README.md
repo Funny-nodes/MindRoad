@@ -95,7 +95,7 @@ https://youtu.be/9hEDvplEHCU
 <br/>
 
 **마음지도 기능 설명 영상**  
-https://youtu.be/e7piBzln1PM  
+https://youtu.be/DEcmotk4cqo 
 <br/>
 
 
