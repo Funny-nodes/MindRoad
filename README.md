@@ -252,6 +252,10 @@ DB_PORT="포트번호"
 EMAIL_USER="G메일 주소"
 EMAIL_PASS="구글계정 앱 비밀번호"
 
+
+# 5. Colab 공용 URL주소(STT)
+LOCALTUNNEL = https://mind-road3.loca.lt 
+
 # Frontend 환경 변수
 
 VITE_API_BASE_URL=http://localhost:3000
