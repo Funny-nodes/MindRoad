@@ -91,7 +91,7 @@ MindRoad는 회의 중 참여자의 음성을 실시간으로 텍스트로 변�
 # 📸 Demo
 
 **2분 시연 영상**  
-https://youtu.be/0z52JlTuuMM  
+https://youtu.be/9hEDvplEHCU   
 <br/>
 
 **마음지도 기능 설명 영상**  
