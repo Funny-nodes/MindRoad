@@ -234,27 +234,18 @@ cd CapStone/CapStone_server/src && npm install
 ```
 # Backend 환경변수
 
-# 1. ClovaSpeech Api 키
-SECRET= '클로바 시크릿 키'
-INVOKE_URL='클로바 invoke 키'
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=1234
+DB_NAME=capstone
+DB_PORT=3306
 
-# 2. Open ai API 키
-OPENAI_API_KEY='OpenAi API 키'
+EMAIL_USER=funnynodes2@gmail.com
+EMAIL_PASS=dyhe esuw ufeq ojur
 
-# 3. DB 설정
-DB_HOST="IP주소"
-DB_USER="사용자"
-DB_PASSWORD="비밀번호"
-DB_NAME="DB이름"
-DB_PORT="포트번호"
+MINDROAD_BASE_URL=https://mind-road2.loca.lt
 
-# 4. 이메일 계정 등록
-EMAIL_USER="G메일 주소"
-EMAIL_PASS="구글계정 앱 비밀번호"
-
-
-# 5. Colab 공용 URL주소(STT)
-LOCALTUNNEL = https://mind-road3.loca.lt 
+LOCALTUNNEL=https://mind-road3.loca.lt
 
 # Frontend 환경 변수
 
