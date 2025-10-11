@@ -95,7 +95,7 @@ https://youtu.be/9hEDvplEHCU
 <br/>
 
 **MindRoad 기능 설명 영상**  
-https://youtu.be/DEcmotk4cqo 
+https://youtu.be/WpUXsjHm8XI 
 <br/>
 
 
