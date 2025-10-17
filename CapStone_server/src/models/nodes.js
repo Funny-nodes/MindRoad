@@ -32,6 +32,13 @@ const Node = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+
+    realTime: {
+      type: DataTypes.TINYINT(1),
+      allowNull: false,
+      defaultValue: 0,
+    },
+    
   },
   {
     tableName: "nodes",
