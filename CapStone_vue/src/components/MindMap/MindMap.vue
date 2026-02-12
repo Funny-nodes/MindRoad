@@ -361,7 +361,7 @@ import {
   watch,
 } from "vue";
 import WebRTC from "..//WebRTC/WebRTC.vue";
-import mouseTracking from "../WebRTC/mouseTracking.vue";
+import MouseTracking from "../WebRTC/MouseTracking.vue";
 import * as go from "gojs";
 import html2canvas from "html2canvas";
 import * as THREE from "three";
