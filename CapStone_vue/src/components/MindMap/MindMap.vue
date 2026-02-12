@@ -397,7 +397,7 @@ import { applyBranchColors, darkenColor } from "../utils/colorUtils";
 export default {
   components: {
     WebRTC,
-    mouseTracking,
+    MouseTracking,
     DotLottieVue,
   },
   setup() {
