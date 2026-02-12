@@ -6,7 +6,7 @@ const { convertToWhisperWav } = require("./convertToWhisperWav");
 const {
   convertSegmentsToSRTJson,
   replaceSpeaker
-} = require("./safeNickName");
+} = require("./safeNickname");
 const { askOpenAI } = require("./callOpenAI"); // 회의록 요약
 const { deleteFiles } = require("./deleteFiles");
 const nodeService = require("../nodeService/nodeService");
