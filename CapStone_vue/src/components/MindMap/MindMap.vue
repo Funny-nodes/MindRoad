@@ -18,7 +18,7 @@
 
     <!-- Main MindMap Content -->
     <div class="main-content" :class="{ 'main-expanded': !sidebarOpen }">
-      <mouseTracking
+      <MouseTracking
         :roomId="roomId"
         :userId="userId"
         :is3DMode="is3DMode"
