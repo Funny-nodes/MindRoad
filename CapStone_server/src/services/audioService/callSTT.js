@@ -9,7 +9,7 @@ exports.callSTT = async(outputWavPath) =>{
 
 
   const paths = Array.isArray(outputWavPath)? outputWavPath : [outputWavPath];
-  const FormData = require("form-Data")
+  const FormData = require("form-data")
   const formData = new FormData();
 
   for (const wavPath of paths) {
