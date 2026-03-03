@@ -6,10 +6,10 @@
 ## 📚 목차
 - [🎯 프로젝트 개요](#about)
 - [✨ 주요 기능](#features)
-- [🛠️ 기술 스택](#stack)
 - [📸 시연 영상](#demo)
 - [🖥️ 주요 화면 및 기능 상세](#screens)
 - [🚀 실행 방법](#run)
+- [🛠️ 기술 스택](#stack)
 - [📬 Contact](#contact)
 
 <br> 
@@ -35,63 +35,6 @@ MindRoad는 회의 중 참여자의 음성을 실시간으로 텍스트로 변�
 - 👥 팀원 초대 및 실시간 동기화 (Socket.IO)
 
 <br>
-
-<a id="stack"></a>
-# 🛠️ 기술 스택
-
-<div align="center">
-
-<!-- 1행 -->
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/>
-<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"/>
-<img src="https://img.shields.io/badge/Express-888888?style=for-the-badge&logo=express&logoColor=white"/>
-<img src="https://img.shields.io/badge/PINECONE-00B1E2?style=for-the-badge&logo=pinecone&logoColor=white"/>
-<br/>
-
-<!-- 2행 -->
-<img src="https://img.shields.io/badge/Vue.js-42B883?style=for-the-badge&logo=vue.js&logoColor=white"/>
-<img src="https://img.shields.io/badge/Vite-9466FF?style=for-the-badge&logo=vite&logoColor=white"/>
-<img src="https://img.shields.io/badge/GoJS-00ADD8?style=for-the-badge&logo=gojs&logoColor=white"/>
-<img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white"/>
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
-<br/>
-
-<!-- 3행 -->
-<img src="https://img.shields.io/badge/Sequelize-53B4E6?style=for-the-badge&logo=sequelize&logoColor=white"/>
-<img src="https://img.shields.io/badge/MySQL-00758F?style=for-the-badge&logo=mysql&logoColor=white"/>
-<img src="https://img.shields.io/badge/Socket.IO-333333?style=for-the-badge&logo=socket.io&logoColor=white"/>
-<img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white"/>
-<br/>
-
-<!-- 4행 -->
-<img src="https://img.shields.io/badge/WebRTC-F37A1F?style=for-the-badge&logo=webrtc&logoColor=white"/>
-<img src="https://img.shields.io/badge/Faster--Whisper-4A90E2?style=for-the-badge&logo=whisper&logoColor=white"/>
-<img src="https://img.shields.io/badge/Google%20Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white"/>
-<br/>
-
-<!-- 5행 -->
-<img src="https://img.shields.io/badge/EleutherAI--polyglot--ko--1.3b-6E48AA?style=for-the-badge&logo=eleutherai&logoColor=white"/>
-<img src="https://img.shields.io/badge/LoRA-FFDE57?style=for-the-badge&logoColor=black"/>
-<img src="https://img.shields.io/badge/RAG-009688?style=for-the-badge&logoColor=white"/>
-<br/>
-
-<!-- 6행 -->
-<img src="https://img.shields.io/badge/SNUNLP--KR--SBERT--V40K--KLUENLI--AUGSTS-2D70B7?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/KIWI--MORPH-53C1DE?style=for-the-badge&logoColor=white"/>
-</div>
-
-
-## 🌐 외부 리소스
-
-<div align="center">
-
-<img src="https://img.shields.io/badge/LottieFiles-00BFFF?style=for-the-badge&logo=lottiefiles&logoColor=white"/>
-<img src="https://img.shields.io/badge/PhotoRoom-8C60FF?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/Freepik-2EC4B6?style=for-the-badge&logoColor=white"/>
-
-</div>
-
-<br/>
 
 <a id="demo"></a>
 # 📸 시연 영상
@@ -272,8 +215,64 @@ VITE_API_BASE_URL=http://localhost:3000
 npm run dev # 프론트 실행
 node server.js # 백엔드 실행
 ```
-
 <br>
+
+<a id="stack"></a>
+# 🛠️ 기술 스택
+
+<div align="center">
+
+<!-- 1행 -->
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/>
+<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"/>
+<img src="https://img.shields.io/badge/Express-888888?style=for-the-badge&logo=express&logoColor=white"/>
+<img src="https://img.shields.io/badge/PINECONE-00B1E2?style=for-the-badge&logo=pinecone&logoColor=white"/>
+<br/>
+
+<!-- 2행 -->
+<img src="https://img.shields.io/badge/Vue.js-42B883?style=for-the-badge&logo=vue.js&logoColor=white"/>
+<img src="https://img.shields.io/badge/Vite-9466FF?style=for-the-badge&logo=vite&logoColor=white"/>
+<img src="https://img.shields.io/badge/GoJS-00ADD8?style=for-the-badge&logo=gojs&logoColor=white"/>
+<img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white"/>
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+<br/>
+
+<!-- 3행 -->
+<img src="https://img.shields.io/badge/Sequelize-53B4E6?style=for-the-badge&logo=sequelize&logoColor=white"/>
+<img src="https://img.shields.io/badge/MySQL-00758F?style=for-the-badge&logo=mysql&logoColor=white"/>
+<img src="https://img.shields.io/badge/Socket.IO-333333?style=for-the-badge&logo=socket.io&logoColor=white"/>
+<img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white"/>
+<br/>
+
+<!-- 4행 -->
+<img src="https://img.shields.io/badge/WebRTC-F37A1F?style=for-the-badge&logo=webrtc&logoColor=white"/>
+<img src="https://img.shields.io/badge/Faster--Whisper-4A90E2?style=for-the-badge&logo=whisper&logoColor=white"/>
+<img src="https://img.shields.io/badge/Google%20Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white"/>
+<br/>
+
+<!-- 5행 -->
+<img src="https://img.shields.io/badge/EleutherAI--polyglot--ko--1.3b-6E48AA?style=for-the-badge&logo=eleutherai&logoColor=white"/>
+<img src="https://img.shields.io/badge/LoRA-FFDE57?style=for-the-badge&logoColor=black"/>
+<img src="https://img.shields.io/badge/RAG-009688?style=for-the-badge&logoColor=white"/>
+<br/>
+
+<!-- 6행 -->
+<img src="https://img.shields.io/badge/SNUNLP--KR--SBERT--V40K--KLUENLI--AUGSTS-2D70B7?style=for-the-badge&logoColor=white"/>
+<img src="https://img.shields.io/badge/KIWI--MORPH-53C1DE?style=for-the-badge&logoColor=white"/>
+</div>
+
+
+## 🌐 외부 리소스
+
+<div align="center">
+
+<img src="https://img.shields.io/badge/LottieFiles-00BFFF?style=for-the-badge&logo=lottiefiles&logoColor=white"/>
+<img src="https://img.shields.io/badge/PhotoRoom-8C60FF?style=for-the-badge&logoColor=white"/>
+<img src="https://img.shields.io/badge/Freepik-2EC4B6?style=for-the-badge&logoColor=white"/>
+
+</div>
+
+<br/>
 
 <a id="contact"></a>
 # 📬 Contact
