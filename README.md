@@ -14,7 +14,7 @@
 
 <br> 
 
-# 🎯 프로젝트 개요 (About)
+# 🎯 프로젝트 개요
 MindRoad는 회의 중 참여자의 음성을 실시간으로 텍스트로 변환하고,<br>
 발언자 구분과 함께 주제별로 자동 마인드맵을 생성하는 웹 기반 협업 도구입니다.
 
@@ -24,7 +24,7 @@ MindRoad는 회의 중 참여자의 음성을 실시간으로 텍스트로 변�
 
 <br>
 
-# ✨ 주요 기능 (Features)
+# ✨ 주요 기능
 - 🎤 실시간 음성 회의 지원 (WebRTC 기반)
 - 🔈 발언자 구분 및 음성 텍스트화 (faster-whisper)
 - 🧠 주제 분류 및 키워드 추출/추천 (EleutherAI/polyglot-ko-1.3b)
@@ -226,7 +226,8 @@ MindRoad는 회의 중 참여자의 음성을 실시간으로 텍스트로 변�
 
 <br>
 
-# 🚀 실행 방법 (Getting Started)
+# 🚀 실행 방법
+
 ### 1. 저장소 클론
 ```
 git clone https://github.com/SunjunSS/CapStone.git
