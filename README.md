@@ -8,6 +8,7 @@
 - [✨ 주요 기능](#-주요-기능-features)
 - [🛠️ 기술 스택](#-기술-스택)
 - [📸 Demo](#-demo)
+- [🖥️ 주요 화면 및 기능 상세](#-주요-화면-및-기능-상세)
 - [🚀 실행 방법](#-실행-방법-getting-started)
 - [📬 Contact](#-contact)
 
@@ -87,17 +88,24 @@ MindRoad는 회의 중 참여자의 음성을 실시간으로 텍스트로 변�
 
 </div>
 
-
-# 📸 Demo
-
-**2분 시연 영상**  
-https://youtu.be/9hEDvplEHCU   
 <br/>
 
-**MindRoad 기능 설명 영상**  
-https://youtu.be/WpUXsjHm8XI 
+# 📸 시연 영상
+
+### ⏱️ 2분 시연 영상
+[![MindRoad 2분 시연 영상](https://img.youtube.com/vi/9hEDvplEHCU/0.jpg)](https://youtu.be/9hEDvplEHCU)
+
+> **2분만에 보는 MindRoad 핵심 기능**  
+> 실시간 회의 + STT + AI 요약/키워드 + 마인드맵 자동 생성까지 전체 흐름을 확인하세요.
+
+### 🎥 MindRoad 기능 설명 영상
+[![MindRoad 기능 설명 영상](https://img.youtube.com/vi/WpUXsjHm8XI/0.jpg)](https://youtu.be/WpUXsjHm8XI)
+
+> **MindRoad 기능 상세**  
+> 기능 구성, 화면 동작, 주요 사용 시나리오를 빠르게 정리했습니다.
 <br/>
 
+# 🖥️ 주요 화면 및 기능 상세
 
 ### 1. 메인화면
 
